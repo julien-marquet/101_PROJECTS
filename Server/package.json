@@ -21,7 +21,8 @@
 		"node-global-storage": "^1.2.3",
 		"npid": "^0.4.0",
 		"request": "^2.83.0",
-		"restify": "^6.3.4"
+		"restify": "^6.3.4",
+		"restify-errors": "^5.0.0"
 	},
 	"devDependencies": {
 		"eslint": "^4.9.0",
