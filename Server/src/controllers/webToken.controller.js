@@ -7,15 +7,20 @@ module.exports = sessions => ({
         if (req.query.code) {
             utilities.get42UserToken(req.query.code).then((token) => {
                 if (!token.success) {
-                    next(new errors.UnauthorizedError(token.response.error));
+                    next(new errors.UnauthorizedError(token.error));
                 } else {
-                    const userSession = sessions.registerSession(token.response);
-                    res.send(200, {
-                        session: userSession,
+                    sessions.registerSession(token.response).then((userSession) => {
+                        res.send(200, {
+                            session: userSession,
+                        });
+                        next();
+                    }).catch((err) => {
+                        console.log(err)
+                        next();
                     });
-                    next();
                 }
             }).catch((err) => {
+                console.log(err);
                 next(new errors.InternalError(JSON.stringify(err)));
             });
         } else {

@@ -6,15 +6,22 @@ class Sessions {
         this.log = log;
     }
     registerSession(token) {
-        const existingSession = this.sessions[token.access_token];
-        let userSession;
-        if (!existingSession) {
-            userSession = utilities.createSession(token);
-        } else {
-            userSession = utilities.updateSession(existingSession, token);
-        }
-        this.sessions[token.access_token] = userSession;
-        return (utilities.filterForClient(userSession));
+        return new Promise((resolve, reject) => {
+            const existingSession = this.sessions[token.access_token];
+            if (!existingSession) {
+                utilities.createSession(token).then((userSession) => {
+                    console.log(userSession);
+                    resolve(utilities.filterForClient(userSession));
+                }).catch((err) => {
+                    console.log(err);
+                    reject(err);
+                });
+            } else {
+                const userSession = utilities.updateSession(existingSession, token);
+                this.sessions[token.access_token] = userSession;
+                resolve(utilities.filterForClient(userSession));
+            }
+        });
     }
 }
 

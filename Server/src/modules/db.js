@@ -1,6 +1,6 @@
 const databaseConfig = require('../configs/database.config');
 const mongoose = require('mongoose');
-require('../models/test.model');
+require('../models/user.model');
 
 module.exports = (log) => {
     const db = mongoose.connection;
