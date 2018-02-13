@@ -5,23 +5,16 @@ class Sessions {
         this.sessions = {};
         this.log = log;
     }
-    findExistingSession(token) {
-        const userSession = this.sessions[token];
-        if (!userSession) {
-            return (null);
+    registerSession(token) {
+        const existingSession = this.sessions[token.access_token];
+        let userSession;
+        if (!existingSession) {
+            userSession = utilities.createSession(token);
+        } else {
+            userSession = utilities.updateSession(existingSession, token);
         }
-        if (utilities.tokenHasExpired(userSession.token)) {
-            utilities.refreshUserToken(userSession.token.refresh_token).then((newToken) => {
-                const updatedSession = utilities.updateSession(userSession, newToken);
-                delete this.sessions[token];
-                this.sessions[newToken.access_token] = updatedSession;
-                return (updatedSession);
-            }).catch((error) => {
-                this.log.error({ ...error }, 'Refresh Token Error');
-                return (null);
-            });
-        }
-        return (userSession);
+        this.sessions[token.access_token] = userSession;
+        return (utilities.filterForClient(userSession));
     }
 }
 

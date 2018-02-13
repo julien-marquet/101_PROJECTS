@@ -16,7 +16,13 @@ module.exports = {
                 if (postErr) {
                     reject(new Error(postErr));
                 } else if (postBody.error) {
-                    resolve({ response: postBody, success: true });
+                    resolve({
+                        response: {
+                            ...postBody,
+                            checked_at: Math.floor(Date.now() / 1000),
+                        },
+                        success: true,
+                    });
                 } else {
                     resolve({ response: postBody, success: false });
                 }

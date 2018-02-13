@@ -9,12 +9,9 @@ module.exports = sessions => ({
                 if (!token.success) {
                     next(new errors.UnauthorizedError(token.response.error));
                 } else {
+                    const userSession = sessions.registerSession(token.response);
                     res.send(200, {
-                        token: {
-                            access_token: token.response.access_token,
-                            expires_in: token.response.expires_in,
-                            checked_at: 0,
-                        },
+                        session: userSession,
                     });
                     next();
                 }
