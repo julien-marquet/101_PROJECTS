@@ -19,7 +19,7 @@ module.exports = sessions => ({
                     });
                 }
             }).catch((err) => {
-                next(new errors.InternalError(JSON.stringify(err)));
+                next(err);
             });
         } else {
             next(new errors.BadRequestError('Missing parameter'));

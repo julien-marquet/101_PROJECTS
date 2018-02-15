@@ -15,23 +15,26 @@ module.exports = {
                     grant_type: 'authorization_code',
                 },
             }, (postErr, postRes, postBody) => {
-                if (postErr) {
+                if (postErr || !postBody) {
                     reject(new errors.InternalError(postErr));
-                }
-                const parsedBody = JSON.parse(postBody);
-                if (parsedBody.error) {
-                    resolve({
-                        ...parsedBody,
-                        success: false,
-                    });
+                } else if (postRes.statusCode === 404) {
+                    reject(errors.makeErrFromCode(postRes.statusCode, '42 API error'));
                 } else {
-                    resolve({
-                        response: {
+                    const parsedBody = JSON.parse(postBody);
+                    if (parsedBody.error) {
+                        resolve({
                             ...parsedBody,
-                            expires_at: Math.floor(Date.now() / 1000) + parsedBody.expires_in,
-                        },
-                        success: true,
-                    });
+                            success: false,
+                        });
+                    } else {
+                        resolve({
+                            response: {
+                                ...parsedBody,
+                                expires_at: Math.floor(Date.now() / 1000) + parsedBody.expires_in,
+                            },
+                            success: true,
+                        });
+                    }
                 }
             });
         });
@@ -54,38 +57,41 @@ module.exports = {
             }, (getErr, getRes, getBody) => {
                 if (getErr || !getBody) {
                     reject(new errors.InternalError(getErr));
-                }
-                const parsedBody = JSON.parse(getBody);
-                if (parsedBody.error) {
-                    reject(errors.makeErrFromCode(getRes.statusCode, `42 API error : ${parsedBody.error}`));
+                } else if (getRes.statusCode === 404) {
+                    reject(errors.makeErrFromCode(getRes.statusCode, '42 API error'));
                 } else {
-                    const user = new User();
-                    user.init(parsedBody.resource_owner_id).then((success) => {
-                        if (success) {
-                            resolve({
-                                user: {
-                                    ...user.infos,
-                                },
-                                token,
-                            });
-                        } else {
-                            user.create(token.access_token).then((error) => {
-                                if (error) {
-                                    reject(error);
-                                }
+                    const parsedBody = JSON.parse(getBody);
+                    if (parsedBody.error) {
+                        reject(errors.makeErrFromCode(getRes.statusCode, `42 API error : ${parsedBody.error}`));
+                    } else {
+                        const user = new User();
+                        user.init(parsedBody.resource_owner_id).then((success) => {
+                            if (success) {
                                 resolve({
                                     user: {
                                         ...user.infos,
                                     },
                                     token,
                                 });
-                            }).catch((userErr) => {
-                                reject(userErr);
-                            });
-                        }
-                    }).catch((userErr) => {
-                        reject(userErr);
-                    });
+                            } else {
+                                user.create(token.access_token).then((error) => {
+                                    if (error) {
+                                        reject(error);
+                                    }
+                                    resolve({
+                                        user: {
+                                            ...user.infos,
+                                        },
+                                        token,
+                                    });
+                                }).catch((userErr) => {
+                                    reject(userErr);
+                                });
+                            }
+                        }).catch((userErr) => {
+                            reject(userErr);
+                        });
+                    }
                 }
             });
         });

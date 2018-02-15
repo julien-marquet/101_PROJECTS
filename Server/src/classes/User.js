@@ -31,25 +31,28 @@ class Sessions {
             }, (getErr, getRes, getBody) => {
                 if (getErr || !getBody) {
                     reject(new errors.InternalError(getErr));
-                }
-                const parsedBody = JSON.parse(getBody);
-                if (parsedBody.error) {
-                    reject(errors.makeErrFromCode(getRes.statusCode, `42 API error : ${parsedBody.error}`));
+                } else if (getRes.statusCode === 404) {
+                    reject(errors.makeErrFromCode(getRes.statusCode, '42 API error'));
                 } else {
-                    const dbUser = new UserModel({
-                        _id: parsedBody.id,
-                        login: parsedBody.login,
-                        first_name: parsedBody.first_name,
-                        last_name: parsedBody.last_name,
-                        campus: parsedBody.campus[0].id,
-                    });
-                    dbUser.save((err, obj) => {
-                        if (err) {
-                            reject(new errors.InternalError(err));
-                        }
-                        this.infos = obj.toJSON();
-                        resolve();
-                    });
+                    const parsedBody = JSON.parse(getBody);
+                    if (parsedBody.error) {
+                        reject(errors.makeErrFromCode(getRes.statusCode, `42 API error : ${parsedBody.error}`));
+                    } else {
+                        const dbUser = new UserModel({
+                            _id: parsedBody.id,
+                            login: parsedBody.login,
+                            first_name: parsedBody.first_name,
+                            last_name: parsedBody.last_name,
+                            campus: parsedBody.campus[0].id,
+                        });
+                        dbUser.save((err, obj) => {
+                            if (err) {
+                                reject(new errors.InternalError(err));
+                            }
+                            this.infos = obj.toJSON();
+                            resolve();
+                        });
+                    }
                 }
             });
         });
