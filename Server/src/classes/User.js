@@ -1,6 +1,7 @@
 const UserModel = require('mongoose').model('User');
 const { api42Endpoint } = require('../configs/global.config');
 const request = require('request');
+const errors = require('restify-errors');
 
 class Sessions {
     constructor() {
@@ -10,7 +11,7 @@ class Sessions {
         return new Promise((resolve, reject) => {
             UserModel.findById({ _id: id }, (err, obj) => {
                 if (err) {
-                    reject(new Error(err));
+                    reject(new errors.InternalError(err));
                 } else if (obj === null) {
                     resolve(false);
                 } else {
@@ -29,11 +30,11 @@ class Sessions {
                 },
             }, (getErr, getRes, getBody) => {
                 if (getErr || !getBody) {
-                    reject(new Error(getErr));
+                    reject(new errors.InternalError(getErr));
                 }
                 const parsedBody = JSON.parse(getBody);
                 if (parsedBody.error) {
-                    resolve(parsedBody);
+                    reject(errors.makeErrFromCode(getRes.statusCode, `42 API error : ${parsedBody.error}`));
                 } else {
                     const dbUser = new UserModel({
                         _id: parsedBody.id,
@@ -44,9 +45,9 @@ class Sessions {
                     });
                     dbUser.save((err, obj) => {
                         if (err) {
-                            reject(new Error(err));
+                            reject(new errors.InternalError(err));
                         }
-                        this.info = obj.toJSON();
+                        this.infos = obj.toJSON();
                         resolve();
                     });
                 }

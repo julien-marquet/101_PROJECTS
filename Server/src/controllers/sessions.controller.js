@@ -1,4 +1,4 @@
-const utilities = require('../utilities/webToken');
+const utilities = require('../utilities/sessions');
 const errors = require('restify-errors');
 
 module.exports = sessions => ({
@@ -15,12 +15,10 @@ module.exports = sessions => ({
                         });
                         next();
                     }).catch((err) => {
-                        console.log(err)
-                        next();
+                        next(err);
                     });
                 }
             }).catch((err) => {
-                console.log(err);
                 next(new errors.InternalError(JSON.stringify(err)));
             });
         } else {
