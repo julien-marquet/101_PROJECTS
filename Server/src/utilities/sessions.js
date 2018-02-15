@@ -1,6 +1,6 @@
-const { redirect_uri, api42Endpoint } = require('../configs/global.config');
+const { api42Endpoint } = require('../configs/global.config');
 const request = require('request');
-const UserModel = require('mongoose').model('User');
+const User = require('../classes/User');
 
 module.exports = {
     tokenHasExpired(token) {
@@ -29,30 +29,36 @@ module.exports = {
                 if (parsedBody.error) {
                     reject(new Error(parsedBody));
                 } else {
-                    UserModel.findById({ _id: parsedBody.resource_owner_id }, (err, obj) => {
-                        if (err) {
-                            reject(new Error(err));
-                        } else if (obj === null) {
-                            // Create User
+                    const user = new User();
+                    user.init(parsedBody.resource_owner_id).then((success) => {
+                        if (success) {
+                            resolve({
+                                user: {
+                                    ...user.infos,
+                                },
+                                token,
+                            });
                         } else {
-                            // Insert User in Session
+                            user.create(token.access_token).then((error) => {
+                                if (error) {
+                                    reject(error);
+                                }
+                                resolve({
+                                    user: {
+                                        ...user.infos,
+                                    },
+                                    token,
+                                });
+                            }).catch((userErr) => {
+                                reject(userErr);
+                            });
                         }
+                    }).catch((userErr) => {
+                        reject(userErr);
                     });
                 }
             });
         });
-        // TODO
-        // Get token owner
-
-        // Find User in DB
-        // UserModel.find({userId: id}, (err, obj) => {
-        //     console.log(obj);
-        //     console.log(err);
-        // });
-        // OK = Retrieve info
-        // NOT OK = create user
-        // Assemble session
-        // return
     },
     filterForClient(session) {
         return ({
