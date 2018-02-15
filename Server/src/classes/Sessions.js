@@ -10,14 +10,15 @@ class Sessions {
             const existingSession = this.sessions[token.access_token];
             if (!existingSession) {
                 utilities.createSession(token).then((userSession) => {
-                    console.log(userSession);
+                    this.sessions[token.access_token] = userSession;
+                    this.log.info(`Session created for user ${userSession.user.login}`);
                     resolve(utilities.filterForClient(userSession));
                 }).catch((err) => {
-                    console.log(err);
                     reject(err);
                 });
             } else {
                 const userSession = utilities.updateSession(existingSession, token);
+                this.log.info(`refreshed session for user ${userSession.user.login}`);
                 this.sessions[token.access_token] = userSession;
                 resolve(utilities.filterForClient(userSession));
             }

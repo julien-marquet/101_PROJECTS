@@ -1,5 +1,6 @@
 const Logger = require('bunyan');
 const globalConfig = require('../configs/global.config');
+const errors = require('restify-errors');
 
 module.exports = () => {
     const streams = [
@@ -18,7 +19,7 @@ module.exports = () => {
         name: globalConfig.name,
         streams,
         serializers: {
-            err: Logger.stdSerializers.err,
+            err: errors.bunyanSerializer,
             req: Logger.stdSerializers.req,
             res: Logger.stdSerializers.res,
         },
