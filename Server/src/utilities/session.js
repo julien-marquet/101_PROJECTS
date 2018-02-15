@@ -100,6 +100,9 @@ module.exports = {
         return ({
             user: {
                 id: session.user.id,
+                login: session.user.login,
+                firstName: session.user.firstName,
+                lastName: session.user.lastName,
             },
             token: {
                 access_token: session.token.access_token,

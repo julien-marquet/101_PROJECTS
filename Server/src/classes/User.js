@@ -41,8 +41,8 @@ class Sessions {
                         const dbUser = new UserModel({
                             _id: parsedBody.id,
                             login: parsedBody.login,
-                            first_name: parsedBody.first_name,
-                            last_name: parsedBody.last_name,
+                            firstName: parsedBody.first_name,
+                            lastName: parsedBody.last_name,
                             campus: parsedBody.campus[0].id,
                         });
                         dbUser.save((err, obj) => {
