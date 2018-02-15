@@ -7,7 +7,7 @@ module.exports = {
     get42UserToken(code) {
         return new Promise((resolve, reject) => {
             request.post(`${api42Endpoint}oauth/token`, {
-                json: {
+                form: {
                     client_id: process.env.API_UID,
                     client_secret: process.env.API_SECRET,
                     code,
@@ -17,16 +17,18 @@ module.exports = {
             }, (postErr, postRes, postBody) => {
                 if (postErr) {
                     reject(new errors.InternalError(postErr));
-                } else if (postBody.error) {
+                }
+                const parsedBody = JSON.parse(postBody);
+                if (parsedBody.error) {
                     resolve({
-                        ...postBody,
+                        ...parsedBody,
                         success: false,
                     });
                 } else {
                     resolve({
                         response: {
-                            ...postBody,
-                            expires_at: Math.floor(Date.now() / 1000) + postBody.expires_in,
+                            ...parsedBody,
+                            expires_at: Math.floor(Date.now() / 1000) + parsedBody.expires_in,
                         },
                         success: true,
                     });
