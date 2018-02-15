@@ -1,3 +1,3 @@
 module.exports = (api, controller) => {
-    api.get('token/', controller.get);
+    api.get('session/', controller.get);
 };

@@ -25,8 +25,8 @@ const Sessions = require('./classes/Sessions');
 
 const sessions = new Sessions(api.log);
 
-const webTokenController = require('./controllers/sessions.controller')(sessions);
-require('./routes/sessions.route')(api, webTokenController);
+const webTokenController = require('./controllers/session.controller')(sessions);
+require('./routes/session.route')(api, webTokenController);
 // ///////////////////////////////////////////////
 
 db.once('open', () => {

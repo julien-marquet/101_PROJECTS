@@ -1,4 +1,4 @@
-const utilities = require('../utilities/sessions');
+const utilities = require('../utilities/session');
 const errors = require('restify-errors');
 
 module.exports = sessions => ({
