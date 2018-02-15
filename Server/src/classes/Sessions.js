@@ -24,6 +24,9 @@ class Sessions {
             }
         });
     }
+    getSession(token) {
+        return (this.sessions[token] || null);
+    }
 }
 
 module.exports = Sessions;
