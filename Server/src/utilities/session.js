@@ -47,7 +47,7 @@ module.exports = {
             },
         });
     },
-    createSession(token) {
+    createSession(token, admins) {
         return new Promise((resolve, reject) => {
             request.get(`${api42Endpoint}oauth/token/info`, {
                 headers: {
@@ -74,7 +74,7 @@ module.exports = {
                                     token,
                                 });
                             } else {
-                                user.create(token.access_token).then((error) => {
+                                user.create(token.access_token, admins).then((error) => {
                                     if (error) {
                                         reject(error);
                                     }
@@ -103,6 +103,7 @@ module.exports = {
                 login: session.user.login,
                 firstName: session.user.firstName,
                 lastName: session.user.lastName,
+                rank: session.user.rank,
             },
             token: {
                 access_token: session.token.access_token,

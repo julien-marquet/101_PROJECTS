@@ -1,10 +1,14 @@
 const errors = require('restify-errors');
 
-module.exports = sessions => ({
+class Access {
+    constructor(sessions) {
+        this.sessions = sessions;
+    }
+
     check(rights) {
         return ((req, res, next) => {
             if (req.headers.access_token) {
-                const userSession = sessions.getSession(req.headers.access_token);
+                const userSession = this.sessions.getSession(req.headers.access_token);
                 if (userSession !== null) {
                     if (rights.includes(userSession.user.rank)) {
                         next();
@@ -18,5 +22,7 @@ module.exports = sessions => ({
                 next(new errors.UnauthorizedError('No access_token provided'));
             }
         });
-    },
-});
+    }
+}
+
+module.exports = Access;

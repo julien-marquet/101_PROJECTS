@@ -16,28 +16,22 @@ api.use(restify.plugins.queryParser());
 
 const pid = npid.create('server.pid', true);
 
+
 api.log.debug({ API_UID: process.env.API_UID, API_SECRET: process.env.API_SECRET }, `Launching ${api.name}`);
 
 const db = require('./modules/db')(api.log);
 
 // ///////////////////////////////////////////////
 const Sessions = require('./classes/Sessions');
+const Access = require('./classes/Access');
 
 const sessions = new Sessions(api.log);
-
-const access = require('./modules/access')(sessions);
+const access = new Access(sessions);
 
 const webTokenController = require('./controllers/session.controller')(sessions);
 require('./routes/session.route')(api, webTokenController);
 require('./routes/test.route')(api, null, access);
 // ///////////////////////////////////////////////
-
-db.once('open', () => {
-    api.log.info('Connection to database established');
-    api.listen(globalConfig.port, () => {
-        api.log.info(`${api.name} listening at ${api.url}`);
-    });
-});
 
 const killApp = () => {
     db.close(() => {
@@ -45,4 +39,18 @@ const killApp = () => {
         process.exit(0);
     });
 };
+
+db.once('open', () => {
+    api.log.info('Connection to database established');
+    sessions.init().then(() => {
+        api.log.debug(`Loaded Admin : ${sessions.admins.map(elem => elem.login).join(', ')}`);
+        api.listen(globalConfig.port, () => {
+            api.log.info(`${api.name} listening at ${api.url}`);
+        });
+    }).catch((err) => {
+        api.log.error(err);
+        killApp();
+    });
+});
+
 process.on('SIGINT', killApp).on('SIGTERM', killApp);
