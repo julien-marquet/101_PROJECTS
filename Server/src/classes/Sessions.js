@@ -26,9 +26,15 @@ class Sessions {
             const existingSession = this.sessions[token.access_token];
             if (!existingSession) {
                 utilities.createSession(token).then((userSession) => {
-                    this.sessions[token.access_token] = userSession;
+                    this.sessions[token.access_token] = {
+                        ...userSession,
+                        user: {
+                            ...userSession.user,
+                            rank: this.assignRank(userSession.user.id),
+                        },
+                    };
                     this.log.info(`Session created for user ${userSession.user.login}`);
-                    resolve(utilities.filterForClient(userSession));
+                    resolve(utilities.filterForClient(this.sessions[token.access_token]));
                 }).catch((err) => {
                     reject(err);
                 });
@@ -45,12 +51,15 @@ class Sessions {
     }
     getRank(token) {
         const session = this.sessions[token];
-        if (!session) {
-            return ('Visitor');
+        if (session) {
+            return (session.user.rank);
         }
+        return ('Visitor');
+    }
+    assignRank(id) {
         let rank = 'Student';
         this.admins.forEach((elem) => {
-            if (elem.id) {
+            if (elem.id === id) {
                 rank = 'Admin';
             }
         });
