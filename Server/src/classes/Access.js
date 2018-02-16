@@ -10,7 +10,6 @@ class Access {
             if (req.headers.access_token) {
                 switch (this.sessions.getSessionStatus(req.headers.access_token)) {
                 case 'Active':
-                    console.log('active');
                     if (rights.includes(this.sessions.getSession(req.headers.access_token).user.rank)) {
                         next();
                     } else {
@@ -18,20 +17,24 @@ class Access {
                     }
                     break;
                 case 'Expired':
-                    // refresh
-                    console.log('expired');
-                    this.sessions.refreshSession(req.headers.access_token).then((newSession) => {
-                        if (rights.includes(newSession.user.rank)) {
+                    if (rights.includes(this.sessions.getSession(req.headers.access_token).user.rank)) {
+                        this.sessions.refreshSession(req.headers.access_token).then((newSession) => {
+                            res.toSend = {
+                                ...res.toSend,
+                                newToken: {
+                                    access_token: newSession.token.access_token,
+                                    expires_at: newSession.token.expires_at,
+                                },
+                            };
                             next();
-                        } else {
-                            next(new errors.UnauthorizedError('Access forbidden'));
-                        }
-                    }).catch((err) => {
-                        next(err);
-                    });
+                        }).catch((err) => {
+                            next(err);
+                        });
+                    } else {
+                        next(new errors.UnauthorizedError('Access forbidden'));
+                    }
                     break;
                 default:
-                    console.log('unknown');
                     next(new errors.UnauthorizedError('Wrong access_token'));
                     break;
                 }

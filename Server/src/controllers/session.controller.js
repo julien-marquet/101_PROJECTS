@@ -11,9 +11,10 @@ module.exports = sessions => ({
                     next(new errors.UnauthorizedError(token.error));
                 } else {
                     sessions.registerSession(token.response).then((userSession) => {
-                        res.send(200, {
+                        res.toSend = {
+                            ...res.toSend,
                             session: userSession,
-                        });
+                        };
                         next();
                     }).catch((err) => {
                         req.log.error(err);

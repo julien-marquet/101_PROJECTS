@@ -24,13 +24,14 @@ const db = require('./modules/db')(api.log);
 // ///////////////////////////////////////////////
 const Sessions = require('./classes/Sessions');
 const Access = require('./classes/Access');
+const sender = require('./modules/sender');
 
 const sessions = new Sessions(api.log);
 const access = new Access(sessions);
 
 const webTokenController = require('./controllers/session.controller')(sessions);
-require('./routes/session.route')(api, webTokenController);
-require('./routes/test.route')(api, null, access);
+require('./routes/session.route')(api, webTokenController, null, sender);
+require('./routes/test.route')(api, null, access, sender);
 // ///////////////////////////////////////////////
 
 const killApp = () => {

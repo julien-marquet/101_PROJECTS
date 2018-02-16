@@ -1,3 +1,3 @@
-module.exports = (api, controller) => {
-    api.get('session/', controller.get);
+module.exports = (api, controller, access, sender) => {
+    api.get('session/', controller.get, sender);
 };
