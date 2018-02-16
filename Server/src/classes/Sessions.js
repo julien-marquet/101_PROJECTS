@@ -49,12 +49,15 @@ class Sessions {
     getSession(token) {
         return (this.sessions[token] || null);
     }
-    getRank(token) {
+    getSessionStatus(token) {
         const session = this.sessions[token];
-        if (session) {
-            return (session.user.rank);
+        if (!session) {
+            return ('Unknown');
         }
-        return ('Visitor');
+        if (session.token.expires_at <= Math.floor(Date.now() / 1000)) {
+            return ('Expired');
+        }
+        return ('Active');
     }
     assignRank(id) {
         let rank = 'Student';

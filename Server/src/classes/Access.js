@@ -8,15 +8,23 @@ class Access {
     check(rights) {
         return ((req, res, next) => {
             if (req.headers.access_token) {
-                const rank = this.sessions.getRank(req.headers.access_token);
-                if (rank !== 'Visitor') {
-                    if (rights.includes(rank)) {
+                switch (this.sessions.getSessionStatus(req.headers.access_token)) {
+                case 'Active':
+                    console.log('active');
+                    if (rights.includes(this.sessions.getSession(req.headers.access_token).user.rank)) {
                         next();
                     } else {
                         next(new errors.UnauthorizedError('Access forbidden'));
                     }
-                } else {
+                    break;
+                case 'Expired':
+                    // refresh
+                    console.log('expired');
+                    break;
+                default:
+                    console.log('unknown');
                     next(new errors.UnauthorizedError('Wrong access_token'));
+                    break;
                 }
             } else {
                 next(new errors.UnauthorizedError('No access_token provided'));
