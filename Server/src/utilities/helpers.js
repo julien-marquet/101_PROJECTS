@@ -18,6 +18,6 @@ module.exports = {
         };
         delete newObj._id; // eslint-disable-line no-underscore-dangle
         delete newObj.__v; // eslint-disable-line no-underscore-dangle
-        return (input);
+        return (newObj);
     },
 };

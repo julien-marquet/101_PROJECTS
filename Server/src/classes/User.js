@@ -22,7 +22,7 @@ class User {
             });
         });
     }
-    create(accessToken, admins) {
+    create(accessToken) {
         return new Promise((resolve, reject) => {
             request.get(`${api42Endpoint}v2/me`, {
                 headers: {
@@ -39,14 +39,7 @@ class User {
                     if (parsedBody.error) {
                         reject(errors.makeErrFromCode(getRes.statusCode, `42 API error : ${parsedBody.error}`));
                     } else {
-                        let rank = 'Student';
-                        admins.forEach((elem) => {
-                            if (elem.id === parsedBody.id) {
-                                rank = 'Admin';
-                            }
-                        });
                         const dbUser = new UserModel({
-                            rank,
                             _id: parsedBody.id,
                             login: parsedBody.login,
                             firstName: parsedBody.first_name,

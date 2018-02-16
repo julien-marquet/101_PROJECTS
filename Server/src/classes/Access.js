@@ -8,9 +8,9 @@ class Access {
     check(rights) {
         return ((req, res, next) => {
             if (req.headers.access_token) {
-                const userSession = this.sessions.getSession(req.headers.access_token);
-                if (userSession !== null) {
-                    if (rights.includes(userSession.user.rank)) {
+                const rank = this.sessions.getRank(req.headers.access_token);
+                if (rank !== 'Visitor') {
+                    if (rights.includes(rank)) {
                         next();
                     } else {
                         next(new errors.UnauthorizedError('Access forbidden'));

@@ -7,7 +7,6 @@ const UserSchema = new Schema({
     login: String,
     firstName: String,
     lastName: String,
-    rank: { type: String, default: 'Student' },
 });
 UserSchema.options.toJSON = {
     transform(doc, ret) {
