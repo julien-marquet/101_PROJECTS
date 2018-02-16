@@ -20,6 +20,15 @@ class Access {
                 case 'Expired':
                     // refresh
                     console.log('expired');
+                    this.sessions.refreshSession(req.headers.access_token).then((newSession) => {
+                        if (rights.includes(newSession.user.rank)) {
+                            next();
+                        } else {
+                            next(new errors.UnauthorizedError('Access forbidden'));
+                        }
+                    }).catch((err) => {
+                        next(err);
+                    });
                     break;
                 default:
                     console.log('unknown');

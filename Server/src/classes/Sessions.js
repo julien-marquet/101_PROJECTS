@@ -21,6 +21,27 @@ class Sessions {
             });
         });
     }
+    refreshSession(token) {
+        return new Promise((resolve, reject) => {
+            const oldSession = this.sessions[token];
+            utilities.refreshToken(oldSession.token.refresh_token).then((refresh) => {
+                if (refresh.statusCode === 200) {
+                    this.sessions[refresh.token.access_token] = {
+                        ...oldSession,
+                        token: {
+                            ...refresh.token,
+                        },
+                    };
+                    delete this.sessions[token];
+                    resolve(this.sessions[refresh.token.access_token]);
+                } else {
+                    reject(errors.makeErrFromCode(refresh.statusCode, refresh.error));
+                }
+            }).catch((err) => {
+                reject(err);
+            });
+        });
+    }
     registerSession(token) {
         return new Promise((resolve, reject) => {
             const existingSession = this.sessions[token.access_token];

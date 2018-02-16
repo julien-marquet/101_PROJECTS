@@ -1,4 +1,4 @@
-const { api42Endpoint, redirect_uri } = require('../configs/global.config');
+const { api42Endpoint, redirectUri } = require('../configs/global.config');
 const request = require('request');
 const User = require('../classes/User');
 const errors = require('restify-errors');
@@ -11,7 +11,7 @@ module.exports = {
                     client_id: process.env.API_UID,
                     client_secret: process.env.API_SECRET,
                     code,
-                    redirect_uri,
+                    redirect_uri: redirectUri,
                     grant_type: 'authorization_code',
                 },
             }, (postErr, postRes, postBody) => {
@@ -33,6 +33,41 @@ module.exports = {
                                 expires_at: Math.floor(Date.now() / 1000) + parsedBody.expires_in,
                             },
                             success: true,
+                        });
+                    }
+                }
+            });
+        });
+    },
+    refreshToken(refreshToken) {
+        return new Promise((resolve, reject) => {
+            request.post(`${api42Endpoint}oauth/token`, {
+                form: {
+                    client_id: process.env.API_UID,
+                    client_secret: process.env.API_SECRET,
+                    refresh_token: refreshToken,
+                    redirect_uri: redirectUri,
+                    grant_type: 'refresh_token',
+                },
+            }, (postErr, postRes, postBody) => {
+                if (postErr || !postBody) {
+                    reject(new errors.InternalError(postErr));
+                } else if (postRes.statusCode === 404) {
+                    reject(errors.makeErrFromCode(postRes.statusCode, '42 API error'));
+                } else {
+                    const parsedBody = JSON.parse(postBody);
+                    if (parsedBody.error) {
+                        resolve({
+                            ...parsedBody,
+                            statusCode: postRes.statusCode,
+                        });
+                    } else {
+                        resolve({
+                            token: {
+                                ...parsedBody,
+                                expires_at: Math.floor(Date.now() / 1000) + parsedBody.expires_in,
+                            },
+                            statusCode: postRes.statusCode,
                         });
                     }
                 }
