@@ -22,8 +22,10 @@ class User {
         return (true);
     }
     async create(accessToken) {
+        let userInfo;
+        let obj;
         try {
-            const userInfo = await rp({
+            userInfo = await rp({
                 uri: `${api42Endpoint}v2/me`,
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
@@ -31,23 +33,23 @@ class User {
                 },
                 json: true,
             });
-            const dbUser = new UserModel({
-                _id: userInfo.id,
-                login: userInfo.login,
-                firstName: userInfo.first_name,
-                lastName: userInfo.last_name,
-                campus: userInfo.campus[0].id,
-            });
-            try {
-                const obj = await dbUser.save();
-                this.infos = (obj.toJSON());
-                return (true);
-            } catch (err) {
-                throw (err);
-            }
         } catch (err) {
             throw (err);
         }
+        const dbUser = new UserModel({
+            _id: userInfo.id,
+            login: userInfo.login,
+            firstName: userInfo.first_name,
+            lastName: userInfo.last_name,
+            campus: userInfo.campus[0].id,
+        });
+        try {
+            obj = await dbUser.save();
+        } catch (err) {
+            throw (err);
+        }
+        this.infos = (obj.toJSON());
+        return (true);
     }
 }
 
