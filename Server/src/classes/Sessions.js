@@ -42,30 +42,34 @@ class Sessions {
             });
         });
     }
-    registerSession(token) {
-        return new Promise((resolve, reject) => {
-            const existingSession = this.sessions[token.access_token];
-            if (!existingSession) {
-                utilities.createSession(token).then((userSession) => {
-                    this.sessions[token.access_token] = {
-                        ...userSession,
-                        user: {
-                            ...userSession.user,
-                            rank: this.assignRank(userSession.user.id),
-                        },
-                    };
-                    this.log.info(`Session created for user ${userSession.user.login}`);
-                    resolve(utilities.filterForClient(this.sessions[token.access_token]));
-                }).catch((err) => {
-                    reject(err);
-                });
-            } else {
-                const userSession = utilities.updateSession(existingSession, token);
-                this.log.info(`refreshed session for user ${userSession.user.login}`);
-                this.sessions[token.access_token] = userSession;
-                resolve(utilities.filterForClient(userSession));
+    async registerSession(token) {
+        const existingSession = this.sessions[token.access_token];
+        if (!existingSession) {
+            try {
+                const userSession = await utilities.createSession(token);
+                this.sessions[token.access_token] = {
+                    ...userSession,
+                    user: {
+                        ...userSession.user,
+                        rank: this.assignRank(userSession.user.id),
+                    },
+                };
+                this.log.info(`Session created for user ${userSession.user.login}`);
+                return (utilities.filterForClient(this.sessions[token.access_token]));
+            } catch (err) {
+                return (err);
             }
-        });
+        } else {
+            const userSession = {
+                ...existingSession,
+                token: {
+                    ...token,
+                },
+            };
+            this.log.info(`refreshed session for user ${userSession.user.login}`);
+            this.sessions[token.access_token] = userSession;
+            return (utilities.filterForClient(userSession));
+        }
     }
     getSession(token) {
         return (this.sessions[token] || null);
