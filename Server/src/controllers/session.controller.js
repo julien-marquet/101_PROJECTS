@@ -2,29 +2,26 @@ const utilities = require('../utilities/session');
 const errors = require('restify-errors');
 
 module.exports = sessions => ({
-    get(req, res, next) {
+    async get(req, res, next) {
         req.log.debug({ ...req.params, ...req.query }, 'GET|Token');
         if (req.query.code) {
-            utilities.get42UserToken(req.query.code).then((token) => {
-                if (!token.success) {
-                    req.log.debug(token.error);
-                    next(new errors.UnauthorizedError(token.error));
-                } else {
-                    sessions.registerSession(token.response).then((userSession) => {
-                        res.toSend = {
-                            ...res.toSend,
-                            session: userSession,
-                        };
-                        next();
-                    }).catch((err) => {
-                        req.log.error(err);
-                        next(err);
-                    });
-                }
-            }).catch((err) => {
-                req.log.error(err);
-                next(err);
-            });
+            try {
+                const token = await utilities.get42UserToken(req.query.code);
+                sessions.registerSession(token).then((userSession) => {
+                    res.toSend = {
+                        ...res.toSend,
+                        session: userSession,
+                    };
+                    next();
+                }).catch((err) => {
+                    req.log.error(err);
+                    next(err);
+                });
+            } catch (err) {
+                const error = errors.makeErrFromCode(err.statusCode, JSON.stringify(err.error));
+                req.log.debug(error);
+                next(error);
+            }
         } else {
             req.log.debug('Missing parameter');
             next(new errors.BadRequestError('Missing parameter'));

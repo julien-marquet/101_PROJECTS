@@ -1,42 +1,26 @@
 const { api42Endpoint, redirectUri } = require('../configs/global.config');
 const request = require('request');
+const rp = require('request-promise');
 const User = require('../classes/User');
 const errors = require('restify-errors');
 
 module.exports = {
-    get42UserToken(code) {
-        return new Promise((resolve, reject) => {
-            request.post(`${api42Endpoint}oauth/token`, {
-                form: {
-                    client_id: process.env.API_UID,
-                    client_secret: process.env.API_SECRET,
-                    code,
-                    redirect_uri: redirectUri,
-                    grant_type: 'authorization_code',
-                },
-            }, (postErr, postRes, postBody) => {
-                if (postErr || !postBody) {
-                    reject(new errors.InternalError(postErr));
-                } else if (postRes.statusCode === 404) {
-                    reject(errors.makeErrFromCode(postRes.statusCode, '42 API error'));
-                } else {
-                    const parsedBody = JSON.parse(postBody);
-                    if (parsedBody.error) {
-                        resolve({
-                            ...parsedBody,
-                            success: false,
-                        });
-                    } else {
-                        resolve({
-                            response: {
-                                ...parsedBody,
-                                expires_at: Math.floor(Date.now() / 1000) + parsedBody.expires_in,
-                            },
-                            success: true,
-                        });
-                    }
-                }
-            });
+    async get42UserToken(code) {
+        const res = await rp({
+            method: 'POST',
+            uri: `${api42Endpoint}oauth/token`,
+            form: {
+                client_id: process.env.API_UID,
+                client_secret: process.env.API_SECRET,
+                code,
+                redirect_uri: redirectUri,
+                grant_type: 'authorization_code',
+            },
+            json: true,
+        });
+        return ({
+            ...res,
+            expires_at: Math.floor(Date.now() / 1000) + res.expires_in,
         });
     },
     refreshToken(refreshToken) {
