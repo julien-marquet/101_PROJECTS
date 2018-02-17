@@ -4,25 +4,22 @@ const errors = require('restify-errors');
 
 module.exports = sessions => ({
     async get(req, res, next) {
+        let userSession;
+        let token;
         req.log.debug({ ...req.params, ...req.query }, 'GET|Token');
         if (req.query.code) {
             try {
-                const token = await utilities.get42UserToken(req.query.code);
-                try {
-                    const userSession = await sessions.registerSession(token);
-                    res.toSend = {
-                        ...res.toSend,
-                        session: userSession,
-                    };
-                    next();
-                } catch (err) {
-                    next(helpers.handleErrors(req, err));
-                }
+                token = await utilities.get42UserToken(req.query.code);
+                userSession = await sessions.registerSession(token);
             } catch (err) {
-                next(helpers.handleErrors(req, err));
+                return (next(helpers.handleErrors(req, err)));
             }
-        } else {
-            next(new errors.BadRequestError('Missing parameter'));
+            res.toSend = {
+                ...res.toSend,
+                session: userSession,
+            };
+            return (next());
         }
+        return (next(new errors.BadRequestError('Missing parameter')));        
     },
 });

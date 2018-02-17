@@ -1,6 +1,6 @@
 const UserModel = require('mongoose').model('User');
 const { api42Endpoint } = require('../configs/global.config');
-const request = require('request');
+const rp = require('request-promise');
 const errors = require('restify-errors');
 const helpers = require('../utilities/helpers');
 
@@ -8,55 +8,46 @@ class User {
     constructor() {
         this.infos = {};
     }
-    init(id) {
-        return new Promise((resolve, reject) => {
-            UserModel.findById({ _id: id }).lean().exec((err, obj) => {
-                if (err) {
-                    reject(new errors.InternalError(err));
-                } else if (obj === null) {
-                    resolve(false);
-                } else {
-                    this.infos = helpers.cleanLeanedResult(obj);
-                    resolve(true);
-                }
-            });
-        });
+    async init(id) {
+        let obj;
+        try {
+            obj = await UserModel.findById({ _id: id }).lean().exec();
+        } catch (err) {
+            throw (new errors.InternalError(err));
+        }
+        if (obj === null) {
+            return (false);
+        }
+        this.infos = helpers.cleanLeanedResult(obj);
+        return (true);
     }
-    create(accessToken) {
-        return new Promise((resolve, reject) => {
-            request.get(`${api42Endpoint}v2/me`, {
+    async create(accessToken) {
+        try {
+            const userInfo = await rp({
+                uri: `${api42Endpoint}v2/me`,
                 headers: {
-                    Authorization: `Bearer ${accessToken}`,
+                    Authorization: `Beaer ${accessToken}`,
                     type: 'application/json',
                 },
-            }, (getErr, getRes, getBody) => {
-                if (getErr || !getBody) {
-                    reject(new errors.InternalError(getErr));
-                } else if (getRes.statusCode === 404) {
-                    reject(errors.makeErrFromCode(getRes.statusCode, '42 API error'));
-                } else {
-                    const parsedBody = JSON.parse(getBody);
-                    if (parsedBody.error) {
-                        reject(errors.makeErrFromCode(getRes.statusCode, `42 API error : ${parsedBody.error}`));
-                    } else {
-                        const dbUser = new UserModel({
-                            _id: parsedBody.id,
-                            login: parsedBody.login,
-                            firstName: parsedBody.first_name,
-                            lastName: parsedBody.last_name,
-                            campus: parsedBody.campus[0].id,
-                        });
-                        dbUser.save((err, obj) => {
-                            if (err) {
-                                reject(new errors.InternalError(err));
-                            }
-                            this.infos = (obj.toJSON());
-                            resolve();
-                        });
-                    }
-                }
+                json: true,
             });
-        });
+            const dbUser = new UserModel({
+                _id: userInfo.id,
+                login: userInfo.login,
+                firstName: userInfo.first_name,
+                lastName: userInfo.last_name,
+                campus: userInfo.campus[0].id,
+            });
+            try {
+                const obj = await dbUser.save();
+                this.infos = (obj.toJSON());
+                return (true);
+            } catch (err) {
+                throw (err);
+            }
+        } catch (err) {
+            throw (err);
+        }
     }
 }
 

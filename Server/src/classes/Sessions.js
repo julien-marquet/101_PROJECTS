@@ -44,32 +44,32 @@ class Sessions {
     }
     async registerSession(token) {
         const existingSession = this.sessions[token.access_token];
+        let userSession;
         if (!existingSession) {
             try {
-                const userSession = await utilities.createSession(token);
-                this.sessions[token.access_token] = {
-                    ...userSession,
-                    user: {
-                        ...userSession.user,
-                        rank: this.assignRank(userSession.user.id),
-                    },
-                };
-                this.log.info(`Session created for user ${userSession.user.login}`);
-                return (utilities.filterForClient(this.sessions[token.access_token]));
+                userSession = await utilities.createSession(token);
             } catch (err) {
-                return (err);
+                throw (err);
             }
-        } else {
-            const userSession = {
-                ...existingSession,
-                token: {
-                    ...token,
+            this.sessions[token.access_token] = {
+                ...userSession,
+                user: {
+                    ...userSession.user,
+                    rank: this.assignRank(userSession.user.id),
                 },
             };
-            this.log.info(`refreshed session for user ${userSession.user.login}`);
-            this.sessions[token.access_token] = userSession;
-            return (utilities.filterForClient(userSession));
+            this.log.info(`Session created for user ${userSession.user.login}`);
+            return (utilities.filterForClient(this.sessions[token.access_token]));
         }
+        userSession = {
+            ...existingSession,
+            token: {
+                ...token,
+            },
+        };
+        this.log.info(`refreshed session for user ${userSession.user.login}`);
+        this.sessions[token.access_token] = userSession;
+        return (utilities.filterForClient(userSession));
     }
     getSession(token) {
         return (this.sessions[token] || null);

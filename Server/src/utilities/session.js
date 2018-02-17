@@ -59,6 +59,7 @@ module.exports = {
         });
     },
     async createSession(token) {
+        let userExist;
         const tokenInfo = await rp({
             method: 'GET',
             uri: `${api42Endpoint}oauth/token/info`,
@@ -69,29 +70,29 @@ module.exports = {
         });
         const user = new User();
         try {
-            const userExist = await user.init(tokenInfo.resource_owner_id);
-            if (userExist) {
-                return ({
-                    user: {
-                        ...user.infos,
-                    },
-                    token,
-                });
-            }
-            try {
-                await user.create(token.access_token);
-                return ({
-                    user: {
-                        ...user.infos,
-                    },
-                    token,
-                });
-            } catch (userErr) {
-                return (userErr);
-            }
+            userExist = await user.init(tokenInfo.resource_owner_id);
         } catch (userErr) {
-            return (userErr);
+            throw userErr;
         }
+        if (userExist) {
+            return ({
+                user: {
+                    ...user.infos,
+                },
+                token,
+            });
+        }
+        try {
+            await user.create(token.access_token);
+        } catch (userErr) {
+            throw userErr;
+        }
+        return ({
+            user: {
+                ...user.infos,
+            },
+            token,
+        });
     },
     filterForClient(session) {
         return ({
