@@ -6,7 +6,8 @@ class Access {
     }
 
     check(rights) {
-        return ((req, res, next) => {
+        return (async (req, res, next) => {
+            let newSession;
             if (req.headers.access_token) {
                 switch (this.sessions.getSessionStatus(req.headers.access_token)) {
                 case 'Active':
@@ -18,18 +19,18 @@ class Access {
                     break;
                 case 'Expired':
                     if (rights.includes(this.sessions.getSession(req.headers.access_token).user.rank)) {
-                        this.sessions.refreshSession(req.headers.access_token).then((newSession) => {
-                            res.toSend = {
-                                ...res.toSend,
-                                newToken: {
-                                    access_token: newSession.token.access_token,
-                                    expires_at: newSession.token.expires_at,
-                                },
-                            };
-                            next();
-                        }).catch((err) => {
+                        try {
+                            newSession = await this.sessions.refreshSession(req.headers.access_token);
+                        } catch (err) {
                             next(err);
-                        });
+                        }
+                        res.toSend = {
+                            ...res.toSend,
+                            newToken: {
+                                access_token: newSession.token.access_token,
+                                expires_at: newSession.token.expires_at,
+                            },
+                        };
                     } else {
                         next(new errors.UnauthorizedError('Access forbidden'));
                     }

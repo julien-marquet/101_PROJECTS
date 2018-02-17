@@ -20,6 +20,6 @@ module.exports = sessions => ({
             };
             return (next());
         }
-        return (next(new errors.BadRequestError('Missing parameter')));        
+        return (next(new errors.BadRequestError('Missing parameter')));
     },
 });

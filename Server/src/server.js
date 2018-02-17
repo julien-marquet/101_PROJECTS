@@ -41,17 +41,22 @@ const killApp = () => {
     });
 };
 
-db.once('open', () => {
+const launchApi = async () => {
     api.log.info('Connection to database established');
-    sessions.init().then(() => {
+    try {
+        await sessions.init();
         api.log.debug(`Loaded Admin : ${sessions.admins.map(elem => elem.login).join(', ')}`);
         api.listen(globalConfig.port, () => {
             api.log.info(`${api.name} listening at ${api.url}`);
         });
-    }).catch((err) => {
+    } catch (err) {
         api.log.error(err);
         killApp();
-    });
+    }
+};
+
+db.once('open', () => {
+    launchApi();
 });
 
 process.on('SIGINT', killApp).on('SIGTERM', killApp);

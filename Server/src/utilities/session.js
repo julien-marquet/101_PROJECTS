@@ -1,8 +1,6 @@
 const { api42Endpoint, redirectUri } = require('../configs/global.config');
-const request = require('request');
 const rp = require('request-promise');
 const User = require('../classes/User');
-const errors = require('restify-errors');
 
 module.exports = {
     async get42UserToken(code) {
@@ -23,9 +21,11 @@ module.exports = {
             expires_at: Math.floor(Date.now() / 1000) + res.expires_in,
         });
     },
-    refreshToken(refreshToken) {
-        return new Promise((resolve, reject) => {
-            request.post(`${api42Endpoint}oauth/token`, {
+    async refreshToken(refreshToken) {
+        let newToken;
+        try {
+            newToken = await rp({
+                uri: `${api42Endpoint}oauth/token`,
                 form: {
                     client_id: process.env.API_UID,
                     client_secret: process.env.API_SECRET,
@@ -33,29 +33,17 @@ module.exports = {
                     redirect_uri: redirectUri,
                     grant_type: 'refresh_token',
                 },
-            }, (postErr, postRes, postBody) => {
-                if (postErr || !postBody) {
-                    reject(new errors.InternalError(postErr));
-                } else if (postRes.statusCode === 404) {
-                    reject(errors.makeErrFromCode(postRes.statusCode, '42 API error'));
-                } else {
-                    const parsedBody = JSON.parse(postBody);
-                    if (parsedBody.error) {
-                        resolve({
-                            ...parsedBody,
-                            statusCode: postRes.statusCode,
-                        });
-                    } else {
-                        resolve({
-                            token: {
-                                ...parsedBody,
-                                expires_at: Math.floor(Date.now() / 1000) + parsedBody.expires_in,
-                            },
-                            statusCode: postRes.statusCode,
-                        });
-                    }
-                }
+                json: true,
             });
+        } catch (err) {
+            throw (err);
+        }
+        return ({
+            token: {
+                ...newToken,
+                expires_at: Math.floor(Date.now() / 1000) + newToken.expires_in,
+            },
+            statusCode: newToken.statusCode,
         });
     },
     async createSession(token) {

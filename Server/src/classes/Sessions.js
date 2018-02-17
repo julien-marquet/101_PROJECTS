@@ -9,38 +9,32 @@ class Sessions {
         this.log = log;
         this.admins = [];
     }
-    init() {
-        return new Promise((resolve, reject) => {
-            AdminModel.find().lean().exec((err, obj) => {
-                if (err) {
-                    reject(new errors.InternalError(err));
-                } else {
-                    this.admins = helpers.cleanLeanedResult(obj);
-                    resolve();
-                }
-            });
-        });
+    async init() {
+        let obj;
+        try {
+            obj = await AdminModel.find().lean().exec();
+        } catch (err) {
+            throw (new errors.InternalError(err));
+        }
+        this.admins = helpers.cleanLeanedResult(obj);
+        return (true);
     }
-    refreshSession(token) {
-        return new Promise((resolve, reject) => {
-            const oldSession = this.sessions[token];
-            utilities.refreshToken(oldSession.token.refresh_token).then((refresh) => {
-                if (refresh.statusCode === 200) {
-                    this.sessions[refresh.token.access_token] = {
-                        ...oldSession,
-                        token: {
-                            ...refresh.token,
-                        },
-                    };
-                    delete this.sessions[token];
-                    resolve(this.sessions[refresh.token.access_token]);
-                } else {
-                    reject(errors.makeErrFromCode(refresh.statusCode, refresh.error));
-                }
-            }).catch((err) => {
-                reject(err);
-            });
-        });
+    async refreshSession(token) {
+        let refreshed;
+        const oldSession = this.sessions[token];
+        try {
+            refreshed = await utilities.refreshToken(oldSession.token.refresh_token);
+        } catch (err) {
+            throw (err);
+        }
+        this.sessions[refreshed.token.access_token] = {
+            ...oldSession,
+            token: {
+                ...refreshed.token,
+            },
+        };
+        delete this.sessions[token];
+        return (this.sessions[refreshed.token.access_token]);
     }
     async registerSession(token) {
         const existingSession = this.sessions[token.access_token];
