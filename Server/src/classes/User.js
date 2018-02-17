@@ -26,7 +26,7 @@ class User {
             const userInfo = await rp({
                 uri: `${api42Endpoint}v2/me`,
                 headers: {
-                    Authorization: `Beaer ${accessToken}`,
+                    Authorization: `Bearer ${accessToken}`,
                     type: 'application/json',
                 },
                 json: true,
