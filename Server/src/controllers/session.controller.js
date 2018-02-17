@@ -1,4 +1,5 @@
 const utilities = require('../utilities/session');
+const helpers = require('../utilities/helpers');
 const errors = require('restify-errors');
 
 module.exports = sessions => ({
@@ -7,23 +8,20 @@ module.exports = sessions => ({
         if (req.query.code) {
             try {
                 const token = await utilities.get42UserToken(req.query.code);
-                sessions.registerSession(token).then((userSession) => {
+                try {
+                    const userSession = await sessions.registerSession(token);
                     res.toSend = {
                         ...res.toSend,
                         session: userSession,
                     };
                     next();
-                }).catch((err) => {
-                    req.log.error(err);
-                    next(err);
-                });
+                } catch (err) {
+                    next(helpers.handleErrors(req, err));
+                }
             } catch (err) {
-                const error = errors.makeErrFromCode(err.statusCode, JSON.stringify(err.error));
-                req.log.debug(error);
-                next(error);
+                next(helpers.handleErrors(req, err));
             }
         } else {
-            req.log.debug('Missing parameter');
             next(new errors.BadRequestError('Missing parameter'));
         }
     },
