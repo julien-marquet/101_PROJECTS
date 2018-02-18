@@ -2,20 +2,19 @@ require('dotenv').config();
 const restify = require('restify');
 const npid = require('npid');
 
-const globalConfig = require('./configs/global.config');
+const {name, version, base_url, port} = require('./configs/global.config');
 const log = require('./modules/logger')();
 
 const api = restify.createServer({
-    name: globalConfig.name,
-    version: globalConfig.version,
-    url: globalConfig.base_url,
     log,
+    name,
+    version,
+    url: base_url
 });
 api.use(restify.plugins.bodyParser({ mapParams: true }));
 api.use(restify.plugins.queryParser());
 
 const pid = npid.create('server.pid', true);
-
 
 api.log.debug({ API_UID: process.env.API_UID, API_SECRET: process.env.API_SECRET }, `Launching ${api.name}`);
 
@@ -46,7 +45,7 @@ const launchApi = async () => {
     try {
         await sessions.init();
         api.log.debug(`Loaded Admin : ${sessions.admins.map(elem => elem.login).join(', ')}`);
-        api.listen(globalConfig.port, () => {
+        api.listen(port, () => {
             api.log.info(`${api.name} listening at ${api.url}`);
         });
     } catch (err) {

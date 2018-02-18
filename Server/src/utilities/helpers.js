@@ -23,7 +23,7 @@ module.exports = {
         return (newObj);
     },
     handleErrors(req, err) {
-        let res = {};
+        let res;
         if (!err) {
             res = new errors.InternalError('Unknown error');
         } else if (!err.statusCode) {
