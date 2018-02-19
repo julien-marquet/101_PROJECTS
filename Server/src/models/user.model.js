@@ -10,10 +10,11 @@ const UserSchema = new Schema({
 });
 UserSchema.options.toJSON = {
     transform(doc, ret) {
-        ret.id = ret._id; // eslint-disable-line
-        delete ret._id; // eslint-disable-line
-        delete ret.__v; // eslint-disable-line
-        return ret;
+        const res = ret;
+        res.id = ret._id;
+        delete res._id;
+        delete res.__v;
+        return res;
     },
 };
 

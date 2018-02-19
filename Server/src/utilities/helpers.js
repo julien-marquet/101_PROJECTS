@@ -3,23 +3,22 @@ const errors = require('restify-errors');
 module.exports = {
     cleanLeanedResult(input) {
         if (Array.isArray(input)) {
-            const newArray = input.map((elem) => {
+            return (input.map((elem) => {
                 const newObj = {
                     ...elem,
-                    id: elem._id, // eslint-disable-line no-underscore-dangle
+                    id: elem._id,
                 };
-                delete newObj._id; // eslint-disable-line no-underscore-dangle
-                delete newObj.__v; // eslint-disable-line no-underscore-dangle
+                delete newObj._id;
+                delete newObj.__v;
                 return newObj;
-            });
-            return (newArray);
+            }));
         }
         const newObj = {
             ...input,
-            id: input._id, // eslint-disable-line no-underscore-dangle
+            id: input._id,
         };
-        delete newObj._id; // eslint-disable-line no-underscore-dangle
-        delete newObj.__v; // eslint-disable-line no-underscore-dangle
+        delete newObj._id;
+        delete newObj.__v;
         return (newObj);
     },
     handleErrors(req, err) {

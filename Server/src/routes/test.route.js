@@ -1,19 +1,19 @@
 module.exports = (api, controller, access, sender) => {
-    api.get('test/Admin', access.check(['Admin']), (req, res, next) => {
+    api.get('test/admin', access.check(['Admin']), (req, res, next) => {
         res.toSend = {
             ...res.toSend,
             message: 'access Admin',
         };
         next();
     }, sender);
-    api.get('test/Student', access.check(['Student', 'Admin']), (req, res, next) => {
+    api.get('test/student', access.check(['Student', 'Admin']), (req, res, next) => {
         res.toSend = {
             ...res.toSend,
             message: 'access Student',
         };
         next();
     }, sender);
-    api.get('test/Visitor', (req, res, next) => {
+    api.get('test/visitor', (req, res, next) => {
         res.toSend = {
             ...res.toSend,
             message: 'access Visitor',

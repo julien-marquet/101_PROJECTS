@@ -45,13 +45,8 @@ class Sessions {
             } catch (err) {
                 throw (err);
             }
-            this.sessions[token.access_token] = {
-                ...userSession,
-                user: {
-                    ...userSession.user,
-                    rank: this.assignRank(userSession.user.id),
-                },
-            };
+            userSession.user.rank = this.assignRank(userSession.user.id);
+            this.sessions[token.access_token] = userSession;
             this.log.info(`Session created for user ${userSession.user.login}`);
             return (utilities.filterForClient(this.sessions[token.access_token]));
         }
@@ -80,10 +75,12 @@ class Sessions {
     }
     assignRank(id) {
         let rank = 'Student';
-        this.admins.forEach((elem) => {
+        this.admins.some((elem) => {
             if (elem.id === id) {
                 rank = 'Admin';
+                return (true);
             }
+            return (false);
         });
         return rank;
     }

@@ -28,10 +28,7 @@ const sender = require('./modules/sender');
 const sessions = new Sessions(api.log);
 const access = new Access(sessions);
 
-const webTokenController = require('./controllers/session.controller')(sessions);
-require('./routes/session.route')(api, webTokenController, null, sender);
-require('./routes/test.route')(api, null, access, sender);
-// ///////////////////////////////////////////////
+require('./routes/index')(api, access, sender, sessions);
 
 const killApp = () => {
     db.close(() => {
@@ -58,4 +55,4 @@ db.once('open', () => {
     launchApi();
 });
 
-process.on('SIGINT', killApp).on('SIGTERM', killApp);
+process.on('SIGINT', killApp).on('SIGTERM', killApp).on('SIGUSR2', killApp);
