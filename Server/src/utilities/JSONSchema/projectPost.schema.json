@@ -1,0 +1,34 @@
+{
+    "properties": {
+        "activePhase": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4
+        },
+        "collaborators": {
+            "type": "array",
+            "items": {
+                "$ref": "refs/project/collaborators.schema.ref.json"
+            }
+        }
+    },
+    "switch": [
+        {
+            "if": { "activePhase": { "enum": [1] }},
+            "then": { "phase": { "$ref": "refs/project/phase1.schema.ref.json" }}
+        },{
+            "if": { "activePhase": { "enum": [2] }},
+            "then": { "phase": { "$ref": "refs/project/phase2.schema.ref.json" }}
+        },{
+            "if": { "activePhase": { "enum": [3] }},
+            "then": { "phase": { "$ref": "refs/project/phase3.schema.ref.json" }}
+        },{
+            "if": { "activePhase": { "enum": [4] }},
+            "then": { "phase": { "$ref": "refs/project/phase4.schema.ref.json" }}
+        }
+    ],
+    "required": [
+        "activePhase"
+    ],
+    "additionalProperties": true
+}

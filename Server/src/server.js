@@ -1,15 +1,19 @@
 require('dotenv').config();
 const restify = require('restify');
 const npid = require('npid');
-
-const {name, version, base_url, port} = require('./configs/global.config');
+const {
+    name,
+    version,
+    base_url,
+    port,
+} = require('./configs/global.config');
 const log = require('./modules/logger')();
 
 const api = restify.createServer({
     log,
     name,
     version,
-    url: base_url
+    url: base_url,
 });
 api.use(restify.plugins.bodyParser({ mapParams: true }));
 api.use(restify.plugins.queryParser());
@@ -23,12 +27,12 @@ const db = require('./modules/db')(api.log);
 // ///////////////////////////////////////////////
 const Sessions = require('./classes/Sessions');
 const Access = require('./classes/Access');
+const RequestValidator = require('./classes/RequestValidator');
 const sender = require('./modules/sender');
 
 const sessions = new Sessions(api.log);
 const access = new Access(sessions);
-
-require('./routes/index')(api, access, sender, sessions);
+const validator = new RequestValidator();
 
 const killApp = () => {
     db.close(() => {
@@ -38,6 +42,8 @@ const killApp = () => {
 };
 
 const launchApi = async () => {
+    await validator.init();
+    require('./routes/index')(api, access, sender, sessions, validator);
     api.log.info('Connection to database established');
     try {
         await sessions.init();

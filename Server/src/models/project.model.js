@@ -9,7 +9,7 @@ const { Schema } = mongoose;
 
 const ProjectSchema = new Schema({
     _id: Schema.Types.Number,
-    phase: {
+    activePhase: {
         type: Number,
         min: 1,
         max: 4,

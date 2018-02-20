@@ -1,0 +1,7 @@
+{
+    "type": "object",
+    "properties": {
+        "content3": { "type": "string" }
+    },
+    "additionalProperties": false
+}

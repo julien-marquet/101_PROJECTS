@@ -1,19 +1,21 @@
 const fs = require('fs');
-const Ajv = require('ajv');
+const $RefParser = require('json-schema-ref-parser');
 
-const ajv = new Ajv();
+process.chdir('src/utilities/JSONSchema');
 
-const schemaLoader = () => {
-    (function readDir(dir = __dirname) {
-        fs.readdirSync(dir).forEach((file) => {
+const schemaLoader = async () => {
+    const array = [];
+    (async function readDir(dir = __dirname) {
+        fs.readdirSync(dir).forEach(async (file) => {
             if (fs.lstatSync(`${dir}/${file}`).isDirectory()) {
-                readDir(`${dir}/${file}`);
+                await readDir(`${dir}/${file}`);
             } else if (file.includes('.schema.js')) {
-                ajv.addSchema(require(`${dir}/${file}`), file.slice(0, file.lastIndexOf('.schema.js')));
+                array[file.slice(0, file.lastIndexOf('.schema.json'))] = await $RefParser.dereference(require(`${dir}/${file}`));
             }
         });
     }());
-    return ajv;
+    process.chdir('../../../');
+    return array;
 };
 
 module.exports = schemaLoader;

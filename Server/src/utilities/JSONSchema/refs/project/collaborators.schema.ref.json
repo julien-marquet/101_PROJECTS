@@ -1,0 +1,20 @@
+{
+    "type": "object",
+    "properties": {
+        "userId": {
+            "type": "integer"
+        },
+        "login": {
+            "type": "string"
+        },
+        "rank": {
+            "type": "string",
+            "enum": ["Developer", "Administrator", "Creator"]
+        }
+    },
+    "required": [
+        "userId",
+        "rank"
+    ],
+    "additionalProperties": false
+}

@@ -1,9 +1,8 @@
-const requestValidator = require('../utilities/requestValidator');
 const errors = require('restify-errors');
 
-module.exports = () => ({
+module.exports = (sessions, validator) => ({
     async post(req, res, next) {
-        if (requestValidator.validateJSON('projectPost', req.body)) {
+        if (validator.validate('projectPost', req.body)) {
             res.toSend = {
                 message: 'ok',
             };
