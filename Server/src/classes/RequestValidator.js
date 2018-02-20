@@ -7,7 +7,6 @@ class RequestValidator {
     }
     async init() {
         this.schemas = await require('../utilities/JSONSchema/index')();
-        return (true);
     }
     validate(schema, data) {
         if (!this.schemas) {
@@ -15,17 +14,12 @@ class RequestValidator {
             return (false);
         }
         const ajv = new Ajv();
-        try {
-            const validate = ajv.compile(this.schemas[schema]);
-            if (!validate(data)) {
-                console.log(validate.errors);
-                return (false);
-            }
-            return (true);
-        } catch (err) {
-            this.log.error(err);
+        const validate = ajv.compile(this.schemas[schema]);
+        if (!validate(data)) {
+            console.log(validate.errors);
             return (false);
         }
+        return (true);
     }
 }
 

@@ -1,5 +1,5 @@
 const fs = require('fs');
-const $RefParser = require('json-schema-ref-parser');
+const refParser = require('json-schema-ref-parser');
 
 process.chdir('src/utilities/JSONSchema');
 
@@ -10,7 +10,7 @@ const schemaLoader = async () => {
             if (fs.lstatSync(`${dir}/${file}`).isDirectory()) {
                 await readDir(`${dir}/${file}`);
             } else if (file.includes('.schema.js')) {
-                array[file.slice(0, file.lastIndexOf('.schema.json'))] = await $RefParser.dereference(require(`${dir}/${file}`));
+                array[file.slice(0, file.lastIndexOf('.schema.json'))] = await refParser.dereference(require(`${dir}/${file}`));
             }
         });
     }());
