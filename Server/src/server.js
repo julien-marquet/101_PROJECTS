@@ -32,7 +32,7 @@ const sender = require('./modules/sender');
 
 const sessions = new Sessions(api.log);
 const access = new Access(sessions);
-const validator = new RequestValidator();
+const validator = new RequestValidator(api.log);
 
 const killApp = () => {
     db.close(() => {
