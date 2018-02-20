@@ -11,7 +11,8 @@ class Access {
             if (req.headers.access_token) {
                 switch (this.sessions.getSessionStatus(req.headers.access_token)) {
                 case 'Active':
-                    if (rights.includes(this.sessions.getSession(req.headers.access_token).user.rank)) {
+                    req.session = this.sessions.getSession(req.headers.access_token);
+                    if (rights.includes(req.session.user.rank)) {
                         next();
                     } else {
                         next(new errors.UnauthorizedError('Access forbidden'));

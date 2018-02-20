@@ -1,6 +1,4 @@
-const mongoose = require('mongoose');
-
-const { Schema } = mongoose;
+const { Schema } = require('mongoose');
 
 const Phase2Schema = new Schema({
     content: {

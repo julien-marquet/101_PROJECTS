@@ -36,5 +36,5 @@ module.exports = {
             req.log.debug(res);
         }
         return (res);
-    }
+    },
 };
