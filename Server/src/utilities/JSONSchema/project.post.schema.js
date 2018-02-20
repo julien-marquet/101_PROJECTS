@@ -2,7 +2,6 @@ module.exports = {
     type: 'object',
     required: [
         'activePhase',
-        'phase',
     ],
     properties: {
         activePhase: {
@@ -10,6 +9,7 @@ module.exports = {
             minimum: 1,
             maximum: 2,
         },
+        phase: {},
     },
     select: { $data: '0/activePhase' },
     selectCases: {
@@ -46,6 +46,6 @@ module.exports = {
             },
         },
     },
-    additionalProperties: true,
+    additionalProperties: false,
 };
 

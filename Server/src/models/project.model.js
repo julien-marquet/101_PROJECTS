@@ -8,7 +8,6 @@ const CollaboratorSchema = require('../models/schemas/collaborator.schema');
 const { Schema } = mongoose;
 
 const ProjectSchema = new Schema({
-    _id: Schema.Types.Number,
     activePhase: {
         type: Number,
         min: 1,
@@ -17,7 +16,7 @@ const ProjectSchema = new Schema({
         required: true,
     },
     collaborators: [CollaboratorSchema],
-    phases: {
+    phase: {
         1: Phase1Schema,
         2: Phase2Schema,
         3: Phase3Schema,
