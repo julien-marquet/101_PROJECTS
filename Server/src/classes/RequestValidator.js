@@ -17,7 +17,11 @@ class RequestValidator {
         const ajv = new Ajv();
         try {
             const validate = ajv.compile(this.schemas[schema]);
-            return (validate(data));
+            if (!validate(data)) {
+                console.log(validate.errors);
+                return (false);
+            }
+            return (true);
         } catch (err) {
             this.log.error(err);
             return (false);
