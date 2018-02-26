@@ -7,7 +7,7 @@ module.exports = {
         activePhase: {
             type: 'number',
             minimum: 1,
-            maximum: 2,
+            maximum: 4,
         },
         phase: {},
     },

@@ -1,9 +1,8 @@
 const fs = require('fs');
 const refParser = require('json-schema-ref-parser');
 
-process.chdir('src/utilities/JSONSchema');
-
 const schemaLoader = async () => {
+    process.chdir('src/utilities/JSONSchema');
     const array = [];
     (async function readDir(dir = __dirname) {
         fs.readdirSync(dir).forEach(async (file) => {

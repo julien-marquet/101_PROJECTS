@@ -6,23 +6,13 @@ const CollaboratorSchema = new Schema({
         unique: true,
         required: true,
     },
-    login: {
-        type: String,
-        lowercase: true,
-        trim: true,
-    },
     rank: {
         type: String,
         enum: ['Developer', 'Administrator', 'Creator'],
         required: true,
     },
-    dateOfEntry: {
-        type: Date,
-        required: true,
-    },
-    dateOfExit: {
-        type: Date,
-    },
+    exitedAt: Date,
+    timestamps: {},
 });
 
 module.exports = CollaboratorSchema;

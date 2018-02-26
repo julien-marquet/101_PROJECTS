@@ -7,6 +7,8 @@ const UserSchema = new Schema({
     login: String,
     firstName: String,
     lastName: String,
+}, {
+    timestamps: true,
 });
 UserSchema.options.toJSON = {
     transform(doc, ret) {
