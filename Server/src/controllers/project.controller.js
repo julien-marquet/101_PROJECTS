@@ -1,5 +1,6 @@
 const errors = require('restify-errors');
 const utilities = require('../utilities/project');
+const helpers = require('../utilities/helpers');
 const ProjectModel = require('mongoose').model('Project');
 
 module.exports = (sessions, validator) => ({
@@ -13,7 +14,7 @@ module.exports = (sessions, validator) => ({
         try {
             obj = await Project.save();
         } catch (err) {
-            next(err);
+            return (next(helpers.handleErrors(req.log, err)));
         }
         res.toSend = {
             id: obj.toJSON().id,

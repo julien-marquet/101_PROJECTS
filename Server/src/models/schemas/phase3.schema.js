@@ -8,6 +8,7 @@ const Phase3Schema = new Schema({
     version: {
         type: String,
         trim: true,
+        default: '1.0',
     },
     linkProjectVersion: {
         type: String,

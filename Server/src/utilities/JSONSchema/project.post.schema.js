@@ -2,12 +2,26 @@ module.exports = {
     type: 'object',
     required: [
         'activePhase',
+        'title',
+        'description',
     ],
     properties: {
         activePhase: {
             type: 'number',
             minimum: 1,
-            maximum: 4,
+            maximum: 3,
+        },
+        repository: {
+            type: 'string',
+        },
+        description: {
+            type: 'string',
+        },
+        title: {
+            type: 'string',
+        },
+        pitch: {
+            type: 'string',
         },
         phase: {},
     },
@@ -17,7 +31,7 @@ module.exports = {
             required: ['phase'],
             properties: {
                 phase: {
-                    $ref: 'refs/project/phase1.schema.ref.json',
+                    $ref: 'refs/project.post/phase1.schema.ref.json',
                 },
             },
         },
@@ -25,7 +39,7 @@ module.exports = {
             required: ['phase'],
             properties: {
                 phase: {
-                    $ref: 'refs/project/phase2.schema.ref.json',
+                    $ref: 'refs/project.post/phase2.schema.ref.json',
                 },
             },
         },
@@ -33,15 +47,7 @@ module.exports = {
             required: ['phase'],
             properties: {
                 phase: {
-                    $ref: 'refs/project/phase3.schema.ref.json',
-                },
-            },
-        },
-        4: {
-            required: ['phase'],
-            properties: {
-                phase: {
-                    $ref: 'refs/project/phase4.schema.ref.json',
+                    $ref: 'refs/project.post/phase3.schema.ref.json',
                 },
             },
         },

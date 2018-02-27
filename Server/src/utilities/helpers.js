@@ -21,19 +21,19 @@ module.exports = {
         delete newObj.__v;
         return (newObj);
     },
-    handleErrors(req, err) {
+    handleErrors(log, err) {
         let res;
         if (!err) {
             res = new errors.InternalError('Unknown error');
         } else if (!err.statusCode) {
-            res = new errors.InternalError(JSON.stringify(err.error));
+            res = new errors.InternalError(err.error ? '' : err);
         } else {
             res = errors.makeErrFromCode(err.statusCode, JSON.stringify(err.error));
         }
         if (res instanceof errors.InternalError) {
-            req.log.error(res);
+            log.error(res);
         } else {
-            req.log.debug(res);
+            log.debug(res);
         }
         return (res);
     },
