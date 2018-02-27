@@ -12,7 +12,7 @@ module.exports = sessions => ({
                 token = await utilities.get42UserToken(req.query.code);
                 userSession = await sessions.registerSession(token);
             } catch (err) {
-                return (next(helpers.handleErrors(req, err)));
+                return (next(helpers.handleErrors(req.log, err)));
             }
             res.toSend = {
                 ...res.toSend,
