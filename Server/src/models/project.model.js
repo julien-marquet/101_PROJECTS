@@ -10,7 +10,7 @@ const ProjectSchema = new Schema({
     activePhase: {
         type: Number,
         min: 1,
-        max: 4,
+        max: 3,
         default: 1,
         required: true,
     },
@@ -29,7 +29,7 @@ const ProjectSchema = new Schema({
     },
     teamSize: {
         type: Number,
-        default: 0,
+        default: 1,
     },
     jobDescription: {
         type: String,
