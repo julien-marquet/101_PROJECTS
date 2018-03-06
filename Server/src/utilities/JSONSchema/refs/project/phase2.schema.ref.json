@@ -1,7 +1,0 @@
-{
-    "type": "object",
-    "properties": {
-        "content": { "type": "string" }
-    },
-    "additionalProperties": false
-}
