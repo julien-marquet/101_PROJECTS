@@ -32,10 +32,7 @@ class Project {
         return this.project;
     }
     checkAccess(rankArray) {
-        if (rankArray.includes(this.activeRank)) {
-            return true;
-        }
-        return false;
+        return (rankArray.includes(this.activeRank));
     }
 }
 
