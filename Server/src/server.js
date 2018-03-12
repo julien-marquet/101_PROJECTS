@@ -4,7 +4,7 @@ const npid = require('npid');
 const {
     name,
     version,
-    base_url,
+    baseUrl,
     port,
 } = require('./configs/global.config');
 const log = require('./modules/logger')();
@@ -13,7 +13,7 @@ const api = restify.createServer({
     log,
     name,
     version,
-    url: base_url,
+    url: baseUrl,
 });
 api.use(restify.plugins.bodyParser({ mapParams: true }));
 api.use(restify.plugins.queryParser());
@@ -22,7 +22,7 @@ const pid = npid.create('server.pid', true);
 
 api.log.debug({ API_UID: process.env.API_UID, API_SECRET: process.env.API_SECRET }, `Launching ${api.name}`);
 
-const db = require('./modules/db')(api.log);
+const db = require('./modules/db')(api.log, pid);
 
 // ///////////////////////////////////////////////
 const Sessions = require('./classes/Sessions');
@@ -34,11 +34,13 @@ const sessions = new Sessions(api.log);
 const access = new Access(sessions);
 const validator = new RequestValidator(api.log);
 
-const killApp = () => {
-    db.close(() => {
-        pid.remove();
-        process.exit(0);
-    });
+const killApp = (status) => {
+    if (db) {
+        db.close(() => {
+            pid.remove();
+            process.exit(status);
+        });
+    }
 };
 
 const launchApi = async () => {
@@ -53,7 +55,7 @@ const launchApi = async () => {
         });
     } catch (err) {
         api.log.error(err);
-        killApp();
+        killApp(1);
     }
 };
 
@@ -61,4 +63,4 @@ db.once('open', () => {
     launchApi();
 });
 
-process.on('SIGINT', killApp).on('SIGTERM', killApp).on('SIGUSR2', killApp);
+process.on('SIGINT', () => killApp(0)).on('SIGTERM', () => killApp(0)).on('SIGUSR2', () => killApp(0));
