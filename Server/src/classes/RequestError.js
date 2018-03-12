@@ -1,6 +1,7 @@
 module.exports = class extends require('./CustomError') {
-    constructor(fields, status) {
-        super('Error completing request', status);
-        this.fields = fields || {};
+    constructor(step, message, status, data) {
+        super(`${step} => ${message}`, status);
+        this.name = 'RequestError';
+        this.data = data || null;
     }
 };

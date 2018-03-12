@@ -1,4 +1,5 @@
 const errors = require('restify-errors');
+const RequestError = require('../classes/RequestError');
 
 module.exports = {
     cleanLeanedResult(input) {
@@ -25,15 +26,12 @@ module.exports = {
         let res;
         if (!err) {
             res = new errors.InternalError('Unknown error');
-        } else if (!err.statusCode) {
-            res = new errors.InternalError(err.error ? '' : err);
+        } else if (err instanceof RequestError) {
+            log.error(`${err.name || 'Unknown Error'} => ${err.message || 'error'}`);
+            res = errors.makeErrFromCode(err.status || 500, `${err.name || 'Unknown'} : ${err.message || 'error'}`, err.data || null);
         } else {
-            res = errors.makeErrFromCode(err.statusCode, JSON.stringify(err.error));
-        }
-        if (res instanceof errors.InternalError) {
-            log.error(res);
-        } else {
-            log.debug(res);
+            log.error(`${err.name || 'Unknown Error'} : ${err.message || 'error'}`);
+            res = errors.makeErrFromCode(err.status || 500, `${err.name || 'Unknown'} : ${err.message || 'error'}`);
         }
         return (res);
     },
