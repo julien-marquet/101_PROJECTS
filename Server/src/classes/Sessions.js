@@ -20,13 +20,8 @@ class Sessions {
         return (true);
     }
     async refreshSession(token) {
-        let refreshed;
         const oldSession = this.sessions[token];
-        try {
-            refreshed = await utilities.refreshToken(oldSession.token.refresh_token);
-        } catch (err) {
-            throw (err);
-        }
+        const refreshed = await utilities.refreshToken(oldSession.token.refresh_token);
         this.sessions[refreshed.token.access_token] = {
             ...oldSession,
             token: {
@@ -40,11 +35,7 @@ class Sessions {
         const existingSession = this.sessions[token.access_token];
         let userSession;
         if (!existingSession) {
-            try {
-                userSession = await utilities.createSession(token);
-            } catch (err) {
-                throw (err);
-            }
+            userSession = await utilities.createSession(token);
             userSession.user.rank = this.assignRank(userSession.user.id);
             this.sessions[token.access_token] = userSession;
             this.log.info(`Session created for user ${userSession.user.login}`);

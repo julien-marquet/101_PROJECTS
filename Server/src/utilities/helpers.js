@@ -30,7 +30,7 @@ module.exports = {
             log.error(`${err.name || 'Unknown Error'} => ${err.message || 'error'}`);
             res = errors.makeErrFromCode(err.status || 500, `${err.name || 'Unknown'} : ${err.message || 'error'}`, err.data || null);
         } else {
-            log.error(`${err.name || 'Unknown Error'} : ${err.message || 'error'}`);
+            log.error(`${err.name || 'Unknown Error'} => ${err.message || 'error'}`);
             res = errors.makeErrFromCode(err.status || 500, `${err.name || 'Unknown'} : ${err.message || 'error'}`);
         }
         return (res);

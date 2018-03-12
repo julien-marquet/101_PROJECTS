@@ -1,20 +1,15 @@
 const UserModel = require('mongoose').model('User');
 const { api42Endpoint } = require('../configs/global.config');
 const rp = require('request-promise');
-const errors = require('restify-errors');
 const helpers = require('../utilities/helpers');
+const RequestError = require('../classes/RequestError');
 
 class User {
     constructor() {
         this.infos = {};
     }
     async init(id) {
-        let obj;
-        try {
-            obj = await UserModel.findById({ _id: id }).lean().exec();
-        } catch (err) {
-            throw (new errors.InternalError(err));
-        }
+        const obj = await UserModel.findById({ _id: id }).lean().exec();
         if (obj === null) {
             return (false);
         }
@@ -23,7 +18,6 @@ class User {
     }
     async create(accessToken) {
         let userInfo;
-        let obj;
         try {
             userInfo = await rp({
                 uri: `${api42Endpoint}v2/me`,
@@ -34,7 +28,7 @@ class User {
                 json: true,
             });
         } catch (err) {
-            throw (err);
+            throw new RequestError('GetUserInfo', `${err.name} : ${err.error.error}`, err.statusCode);
         }
         const dbUser = new UserModel({
             _id: userInfo.id,
@@ -43,11 +37,7 @@ class User {
             lastName: userInfo.last_name,
             campus: userInfo.campus[0].id,
         });
-        try {
-            obj = await dbUser.save();
-        } catch (err) {
-            throw (err);
-        }
+        const obj = await dbUser.save();
         this.infos = (obj.toJSON());
         return (true);
     }

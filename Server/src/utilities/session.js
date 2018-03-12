@@ -42,7 +42,7 @@ module.exports = {
                 json: true,
             });
         } catch (err) {
-            throw (err);
+            throw new RequestError('RefreshToken', `${err.name} : ${err.error.error}`, err.statusCode);
         }
         return ({
             token: {
@@ -53,21 +53,21 @@ module.exports = {
         });
     },
     async createSession(token) {
-        let userExist;
-        const tokenInfo = await rp({
-            method: 'GET',
-            uri: `${api42Endpoint}oauth/token/info`,
-            headers: {
-                Authorization: `Bearer ${token.access_token}`,
-            },
-            json: true,
-        });
-        const user = new User();
+        let tokenInfo;
         try {
-            userExist = await user.init(tokenInfo.resource_owner_id);
-        } catch (userErr) {
-            throw userErr;
+            tokenInfo = await rp({
+                method: 'GET',
+                uri: `${api42Endpoint}oauth/token/info`,
+                headers: {
+                    Authorization: `Bearer ${token.access_token}`,
+                },
+                json: true,
+            });
+        } catch (err) {
+            throw new RequestError('GetUserToken', `${err.name} : ${err.error.error}`, err.statusCode);
         }
+        const user = new User();
+        const userExist = await user.init(tokenInfo.resource_owner_id);
         if (userExist) {
             return ({
                 user: {
@@ -76,11 +76,7 @@ module.exports = {
                 token,
             });
         }
-        try {
-            await user.create(token.access_token);
-        } catch (userErr) {
-            throw userErr;
-        }
+        await user.create(token.access_token);
         return ({
             user: {
                 ...user.infos,

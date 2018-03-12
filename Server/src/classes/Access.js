@@ -20,11 +20,7 @@ class Access {
                     break;
                 case 'Expired':
                     if (rights.includes(this.sessions.getSession(req.headers.access_token).user.rank)) {
-                        try {
-                            newSession = await this.sessions.refreshSession(req.headers.access_token);
-                        } catch (err) {
-                            next(err);
-                        }
+                        newSession = await this.sessions.refreshSession(req.headers.access_token);
                         res.toSend = {
                             ...res.toSend,
                             newToken: {
