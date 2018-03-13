@@ -11,6 +11,9 @@ module.exports = {
             minimum: 1,
             maximum: 3,
         },
+        public: {
+            type: 'boolean',
+        },
         repository: {
             type: 'string',
         },

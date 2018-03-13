@@ -20,6 +20,7 @@ module.exports = (sessions, validator) => ({
         res.toSend = {
             id: obj.toJSON().id,
         };
+        req.log.info(`Project ${project.title} created by user ${req.session.user.login}`);
         return next();
     },
     async delete(req, res, next) {
@@ -41,6 +42,21 @@ module.exports = (sessions, validator) => ({
         }
         res.toSend = {
             message: 'Project succesfully removed',
+        };
+        req.log.info(`Project ${project.data.title} deleted by user ${req.session.user.login}`);
+        return next();
+    },
+    async get(req, res, next) {
+        const project = new Project();
+        try {
+            if (await project.init(req.params.projectId, req.session ? req.session.user : null) === null) {
+                return (next(new errors.ResourceNotFoundError('Project not found')));
+            }
+        } catch (err) {
+            return (next(helpers.handleErrors(req.log, err)));
+        }
+        res.toSend = {
+            project: project.data,
         };
         return next();
     },

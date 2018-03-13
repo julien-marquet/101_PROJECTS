@@ -14,6 +14,10 @@ const ProjectSchema = new Schema({
         default: 1,
         required: true,
     },
+    public: {
+        type: Boolean,
+        default: true,
+    },
     collaborators: [CollaboratorSchema],
     repository: String,
     description: String,
