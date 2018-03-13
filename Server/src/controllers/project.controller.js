@@ -60,9 +60,18 @@ module.exports = (sessions, validator) => ({
         };
         return next();
     },
+    async put(req, res, next) {
+        if (!validator.validate('project.put', req.body)) {
+            return next(new errors.BadRequestError('Invalid or missing field'));
+        }
+        return next();
+    },
     phase: {
         async post(req, res, next) {
-            next();
+            if (!validator.validate('project.phase.post', req.body)) {
+                return next(new errors.BadRequestError('Invalid or missing field'));
+            }
+            return next();
         },
     },
 });
