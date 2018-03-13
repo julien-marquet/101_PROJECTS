@@ -60,4 +60,9 @@ module.exports = (sessions, validator) => ({
         };
         return next();
     },
+    phase: {
+        async post(req, res, next) {
+            next();
+        },
+    },
 });
