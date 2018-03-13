@@ -35,6 +35,12 @@ class Project {
         this.json = this.data.toJSON();
         return this.json;
     }
+    async update(newContent) {
+        this.data.set(newContent);
+        await this.data.save();
+        this.json = this.data.toJSON();
+        return this.json;
+    }
     checkAccess(rankArray) {
         return (rankArray.includes(this.activeRank));
     }
