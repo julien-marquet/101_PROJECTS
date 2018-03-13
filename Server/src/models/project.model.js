@@ -47,14 +47,25 @@ const ProjectSchema = new Schema({
     timestamps: true,
 });
 
-ProjectSchema.options.toJSON = {
-    transform(doc, ret) {
-        const res = ret;
-        res.id = ret._id;
-        delete res._id;
+ProjectSchema.set('toJSON', {
+    virtuals: true,
+    transform: (doc, ret) => {
+        const res = {
+            ...ret,
+            id: ret._id.toString(),
+            collaborators: ret.collaborators.map((collab) => {
+                const newObj = {
+                    ...collab,
+                    id: collab._id,
+                };
+                delete newObj._id;
+                return newObj;
+            }),
+        };
         delete res.__v;
+        delete res._id;
         return res;
     },
-};
+});
 
 module.exports = mongoose.model('Project', ProjectSchema);

@@ -1,7 +1,6 @@
 const UserModel = require('mongoose').model('User');
 const { api42Endpoint } = require('../configs/global.config');
 const rp = require('request-promise');
-const helpers = require('../utilities/helpers');
 const RequestError = require('../classes/RequestError');
 
 class User {
@@ -9,11 +8,11 @@ class User {
         this.infos = {};
     }
     async init(id) {
-        const obj = await UserModel.findById({ _id: id }).lean().exec();
+        const obj = await UserModel.findById({ _id: id });
         if (obj === null) {
             return (false);
         }
-        this.infos = helpers.cleanLeanedResult(obj);
+        this.infos = obj.toJSON();
         return (true);
     }
     async create(accessToken) {

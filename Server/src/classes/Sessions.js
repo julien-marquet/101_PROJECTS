@@ -1,7 +1,5 @@
 const utilities = require('../utilities/session');
 const AdminModel = require('mongoose').model('Admin');
-const errors = require('restify-errors');
-const helpers = require('../utilities/helpers');
 
 class Sessions {
     constructor(log) {
@@ -10,14 +8,8 @@ class Sessions {
         this.admins = [];
     }
     async init() {
-        let obj;
-        try {
-            obj = await AdminModel.find().lean().exec();
-        } catch (err) {
-            throw (new errors.InternalError(err));
-        }
-        this.admins = helpers.cleanLeanedResult(obj);
-        return (true);
+        this.admins = await AdminModel.find();
+        this.admins = this.admins.map(o => o.toJSON());
     }
     async refreshSession(token) {
         const oldSession = this.sessions[token];

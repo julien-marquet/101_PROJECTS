@@ -4,11 +4,12 @@ const CustomError = require('../classes/CustomError');
 class Project {
     constructor(log) {
         this.log = log;
+        this.json = {};
         this.data = {};
         this.activeRank = null;
     }
     async init(projectId, user) {
-        this.data = await ProjectModel.findById({ _id: projectId }).lean().exec();
+        this.data = await ProjectModel.findById({ _id: projectId });
         if (this.data === null) {
             return (null);
         }
@@ -31,7 +32,8 @@ class Project {
         if (this.activeRank === 'Visitor' && !this.data.public) {
             throw new CustomError('Forbidden Access', 403);
         }
-        return this.data;
+        this.json = this.data.toJSON();
+        return this.json;
     }
     checkAccess(rankArray) {
         return (rankArray.includes(this.activeRank));
