@@ -81,8 +81,8 @@ module.exports = (sessions, validator) => ({
         return next();
     },
     phase: {
-        async post(req, res, next) {
-            if (!validator.validate('project.phase.post', req.body)) {
+        async put(req, res, next) {
+            if (!validator.validate('project.phase.put', req.body)) {
                 return next(new errors.BadRequestError('Invalid or missing field'));
             }
             const project = new Project();
