@@ -35,8 +35,36 @@ class Project {
         this.json = this.data.toJSON();
         return this.json;
     }
-    async update(newContent) {
-        this.data.set(newContent);
+    async save(body, session) {
+        const saved = {
+            ...body,
+            collaborators: [{
+                userId: session.user.id,
+                login: session.user.login,
+                rank: 'Creator',
+                dateOfEntry: Date.now(),
+            }],
+            phase: {
+                [body.activePhase]: {
+                    ...body.phase,
+                },
+            },
+        };
+        this.data = new ProjectModel(saved);
+        await this.data.save();
+        this.json = this.data.toJSON();
+        return this.json;
+    }
+    async update(body) {
+        const saved = {
+            ...body,
+            phase: {
+                [this.json.activePhase]: {
+                    ...body.phase,
+                },
+            },
+        };
+        this.data.set(saved);
         await this.data.save();
         this.json = this.data.toJSON();
         return this.json;

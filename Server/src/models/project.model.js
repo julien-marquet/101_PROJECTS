@@ -61,7 +61,12 @@ ProjectSchema.set('toJSON', {
                 delete newObj._id;
                 return newObj;
             }),
+            phase: {
+                ...ret.phase[ret.activePhase],
+                id: ret.phase[ret.activePhase]._id,
+            },
         };
+        delete res.phase._id;
         delete res.__v;
         delete res._id;
         return res;

@@ -1,5 +1,4 @@
 const errors = require('restify-errors');
-const utilities = require('../utilities/project');
 const helpers = require('../utilities/helpers');
 const ProjectModel = require('mongoose').model('Project');
 const Project = require('../classes/Project');
@@ -9,16 +8,14 @@ module.exports = (sessions, validator) => ({
         if (!validator.validate('project.post', req.body)) {
             return next(new errors.BadRequestError('Invalid or missing field'));
         }
-        const project = await utilities.constructProject(req.body, req.session);
-        const ProjectM = new ProjectModel(project);
-        let obj;
+        const project = new Project();
         try {
-            obj = await ProjectM.save();
+            await project.save(req.body, req.session);
         } catch (err) {
             return (next(helpers.handleErrors(req.log, err)));
         }
         res.toSend = {
-            id: obj.toJSON().id,
+            id: project.json.id,
         };
         req.log.info(`Project ${project.title} created by user ${req.session.user.login}`);
         return next();
@@ -42,7 +39,7 @@ module.exports = (sessions, validator) => ({
         res.toSend = {
             message: 'Project succesfully removed',
         };
-        req.log.info(`Project ${project.data.title} deleted by user ${req.session.user.login}`);
+        req.log.info(`Project ${project.json.title} deleted by user ${req.session.user.login}`);
         return next();
     },
     async get(req, res, next) {
@@ -55,7 +52,7 @@ module.exports = (sessions, validator) => ({
             return (next(helpers.handleErrors(req.log, err)));
         }
         res.toSend = {
-            project: project.data,
+            project: project.json,
         };
         return next();
     },
