@@ -85,6 +85,27 @@ module.exports = (sessions, validator) => ({
             if (!validator.validate('project.phase.post', req.body)) {
                 return next(new errors.BadRequestError('Invalid or missing field'));
             }
+            const project = new Project();
+            try {
+                if (await project.init(req.params.projectId, req.session.user) === null) {
+                    return (next(new errors.ResourceNotFoundError('Project not found')));
+                } else if (!project.checkAccess(['Creator', 'Administrator'])) {
+                    return (next(new errors.ForbiddenError('Your rank for this project is insufficient')));
+                }
+            } catch (err) {
+                return (next(helpers.handleErrors(req.log, err)));
+            }
+            if (project.json.activePhase === req.body.activePhase) {
+                return next(new errors.BadRequestError('this phase is already active'));
+            }
+            try {
+                await project.update(req.body);
+            } catch (err) {
+                return (next(helpers.handleErrors(req.log, err)));
+            }
+            res.toSend = {
+                message: 'Project succesfully updated',
+            };
             return next();
         },
     },

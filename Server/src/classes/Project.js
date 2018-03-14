@@ -9,6 +9,7 @@ class Project {
         this.activeRank = null;
     }
     async init(projectId, user) {
+        console.log(projectId)
         this.data = await ProjectModel.findById({ _id: projectId });
         if (this.data === null) {
             return (null);
@@ -59,7 +60,7 @@ class Project {
         const saved = {
             ...body,
             phase: {
-                [this.json.activePhase]: {
+                [body.activePhase || this.json.activePhase]: {
                     ...body.phase,
                 },
             },
