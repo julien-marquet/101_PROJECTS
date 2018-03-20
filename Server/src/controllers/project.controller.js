@@ -1,6 +1,7 @@
 const errors = require('restify-errors');
 const helpers = require('../utilities/helpers');
 const utilities = require('../utilities/project');
+const userUtilities = require('../utilities/user');
 const Project = require('../classes/Project');
 const ProjectModel = require('mongoose').model('Project');
 
@@ -122,10 +123,14 @@ module.exports = (sessions, validator) => ({
                     return (next(new errors.ForbiddenError('Your rank for this project is insufficient')));
                 } else if (accessGranted === null) {
                     return (next(new errors.ResourceNotFoundError('Project or user not found')));
+                } else if (await userUtilities.userExists(req.body.userId) === false) {
+                    return (next(new errors.ResourceNotFoundError('User not found')));
+                } else if (await utilities.isCollaborator(req.params.projectId, req.body.userId)) {
+                    return (next(new errors.BadRequestError('User already a collaborator')));
                 }
                 try {
                     res.toSend = {
-                        id: await utilities.saveApplication(req.params.projectId, req.body.userId, req.session.user.id),
+                        id: await utilities.saveProjectApplication(req.params.projectId, req.body.userId, req.session.user.id),
                     };
                 } catch (err) {
                     return (next(helpers.handleErrors(req.log, err)));
@@ -135,7 +140,19 @@ module.exports = (sessions, validator) => ({
         },
         apply: {
             async post(req, res, next) {
-
+                if (await utilities.projectExist(req.params.projectId) === false) {
+                    return (next(new errors.ResourceNotFoundError('Project not found')));
+                } else if (await utilities.isCollaborator(req.params.projectId, req.session.user.id)) {
+                    return (next(new errors.BadRequestError('User already a collaborator')));
+                }
+                try {
+                    res.toSend = {
+                        id: await utilities.saveUserApplication(req.params.projectId, req.body.userId, req.session.user.id),
+                    };
+                } catch (err) {
+                    return (next(helpers.handleErrors(req.log, err)));
+                }
+                return next();
             },
         },
     },

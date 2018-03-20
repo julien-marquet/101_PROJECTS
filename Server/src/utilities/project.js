@@ -25,7 +25,13 @@ module.exports = {
             return false;
         }
     },
-    async saveApplication(projectId, userId, initiator) {
+    async projectExist(projectId) {
+        return (await ProjectModel.count({ _id: mongoose.Types.ObjectId(projectId) }) > 0);
+    },
+    async isCollaborator(projectId, userId) {
+        return (await ProjectModel.count({ _id: mongoose.Types.ObjectId(projectId), 'collaborators.userId': userId }) > 0);
+    },
+    async saveProjectApplication(projectId, userId, initiator) {
         if (await ApplicationModel.count({ projectId, userId }) !== 0) {
             throw new CustomError('the Application already exist', 400);
         }
@@ -36,6 +42,20 @@ module.exports = {
             userId,
             type: 'project',
             initiator,
+        });
+        await application.save();
+        return _id;
+    },
+    async saveUserApplication(projectId, userId) {
+        if (await ApplicationModel.count({ projectId, userId }) !== 0) {
+            throw new CustomError('the Application already exist', 400);
+        }
+        const _id = mongoose.Types.ObjectId();
+        const application = new ApplicationModel({
+            _id,
+            projectId: mongoose.Types.ObjectId(projectId),
+            userId,
+            type: 'user',
         });
         await application.save();
         return _id;
