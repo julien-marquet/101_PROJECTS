@@ -26,7 +26,13 @@ module.exports = {
         }
     },
     async projectExist(projectId) {
-        return (await ProjectModel.count({ _id: mongoose.Types.ObjectId(projectId) }) > 0);
+        let res;
+        try {
+            res = await ProjectModel.count({ _id: mongoose.Types.ObjectId(projectId) }) > 0;
+        } catch (err) {
+            return false;
+        }
+        return res;
     },
     async isCollaborator(projectId, userId) {
         return (await ProjectModel.count({ _id: mongoose.Types.ObjectId(projectId), 'collaborators.userId': userId }) > 0);
@@ -59,5 +65,9 @@ module.exports = {
         });
         await application.save();
         return _id;
+    },
+    async getProjectApplication(projectId) {
+        const res = await ApplicationModel.find({ projectId: mongoose.Types.ObjectId(projectId) });
+        return res.map(o => o.toJSON());
     },
 };

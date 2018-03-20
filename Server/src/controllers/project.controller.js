@@ -113,20 +113,34 @@ module.exports = (sessions, validator) => ({
         },
     },
     application: {
+        async get(req, res, next) {
+            let result;
+            try {
+                result = await utilities.getProjectApplication(req.params.projectId);
+            } catch (err) {
+                return (next(helpers.handleErrors(req.log, err)));
+            }
+            res.toSend = result;
+            return next();
+        },
         invite: {
             async post(req, res, next) {
                 if (!validator.validate('project.application.post', req.body)) {
                     return next(new errors.BadRequestError('Invalid or missing field'));
                 }
-                const accessGranted = await utilities.checkUserAccess(req.params.projectId, req.session.user.id, ['Administrator', 'Creator']);
-                if (accessGranted === false) {
-                    return (next(new errors.ForbiddenError('Your rank for this project is insufficient')));
-                } else if (accessGranted === null) {
-                    return (next(new errors.ResourceNotFoundError('Project or user not found')));
-                } else if (await userUtilities.userExists(req.body.userId) === false) {
-                    return (next(new errors.ResourceNotFoundError('User not found')));
-                } else if (await utilities.isCollaborator(req.params.projectId, req.body.userId)) {
-                    return (next(new errors.BadRequestError('User already a collaborator')));
+                try {
+                    const accessGranted = await utilities.checkUserAccess(req.params.projectId, req.session.user.id, ['Administrator', 'Creator']);
+                    if (accessGranted === false) {
+                        return (next(new errors.ForbiddenError('Your rank for this project is insufficient')));
+                    } else if (accessGranted !== true) {
+                        return (next(new errors.ResourceNotFoundError('Project or user not found')));
+                    } else if (await userUtilities.userExists(req.body.userId) !== true) {
+                        return (next(new errors.ResourceNotFoundError('User not found')));
+                    } else if (await utilities.isCollaborator(req.params.projectId, req.body.userId) !== false) {
+                        return (next(new errors.BadRequestError('User already a collaborator')));
+                    }
+                } catch (err) {
+                    return (next(helpers.handleErrors(req.log, err)));
                 }
                 try {
                     res.toSend = {
@@ -140,10 +154,14 @@ module.exports = (sessions, validator) => ({
         },
         apply: {
             async post(req, res, next) {
-                if (await utilities.projectExist(req.params.projectId) === false) {
-                    return (next(new errors.ResourceNotFoundError('Project not found')));
-                } else if (await utilities.isCollaborator(req.params.projectId, req.session.user.id)) {
-                    return (next(new errors.BadRequestError('User already a collaborator')));
+                try {
+                    if (await utilities.projectExist(req.params.projectId) !== true) {
+                        return (next(new errors.ResourceNotFoundError('Project not found')));
+                    } else if (await utilities.isCollaborator(req.params.projectId, req.session.user.id) !== false) {
+                        return (next(new errors.BadRequestError('User already a collaborator')));
+                    }
+                } catch (err) {
+                    return (next(helpers.handleErrors(req.log, err)));
                 }
                 try {
                     res.toSend = {
