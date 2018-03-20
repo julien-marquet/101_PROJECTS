@@ -1,5 +1,6 @@
 const errors = require('restify-errors');
 const helpers = require('../utilities/helpers');
+const utilities = require('../utilities/project');
 const ProjectModel = require('mongoose').model('Project');
 const Project = require('../classes/Project');
 
@@ -106,6 +107,15 @@ module.exports = (sessions, validator) => ({
             res.toSend = {
                 message: 'Project succesfully updated',
             };
+            return next();
+        },
+    },
+    application: {
+        async post(req, res, next) {
+            if (!validator.validate('project.application.post', req.body)) {
+                return next(new errors.BadRequestError('Invalid or missing field'));
+            }
+            await utilities.checkUserAccess(req.params.projectId, req.session.user.id, ['Student']);
             return next();
         },
     },

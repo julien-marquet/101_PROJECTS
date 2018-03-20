@@ -9,7 +9,6 @@ class Project {
         this.activeRank = null;
     }
     async init(projectId, user) {
-        console.log(projectId)
         this.data = await ProjectModel.findById({ _id: projectId });
         if (this.data === null) {
             return (null);

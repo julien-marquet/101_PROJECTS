@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
-const CommentSchema = new Schema({
+const ApplicationSchema = new Schema({
     projectId: {
         type: Schema.Types.ObjectId,
         required: true,
@@ -11,9 +11,7 @@ const CommentSchema = new Schema({
         type: Schema.Types.ObjectId,
         required: true,
     },
-    parent: Schema.Types.ObjectId,
-    phase: Schema.Types.ObjectId,
-    content: {
+    initiator: {
         type: String,
         required: true,
     },
@@ -21,4 +19,4 @@ const CommentSchema = new Schema({
     timestamps: true,
 });
 
-module.exports = mongoose.model('Comment', CommentSchema);
+module.exports = mongoose.model('Application', ApplicationSchema);
