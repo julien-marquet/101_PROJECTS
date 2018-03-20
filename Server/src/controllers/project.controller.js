@@ -112,24 +112,31 @@ module.exports = (sessions, validator) => ({
         },
     },
     application: {
-        async post(req, res, next) {
-            if (!validator.validate('project.application.post', req.body)) {
-                return next(new errors.BadRequestError('Invalid or missing field'));
-            }
-            const accessGranted = await utilities.checkUserAccess(req.params.projectId, req.session.user.id, ['Administrator', 'Creator']);
-            if (accessGranted === false) {
-                return (next(new errors.ForbiddenError('Your rank for this project is insufficient')));
-            } else if (accessGranted === null) {
-                return (next(new errors.ResourceNotFoundError('Project or user not found')));
-            }
-            try {
-                res.toSend = {
-                    id: await utilities.saveApplication(req.params.projectId, req.body.userId, req.session.user.id),
-                };
-            } catch (err) {
-                return (next(helpers.handleErrors(req.log, err)));
-            }
-            return next();
+        invite: {
+            async post(req, res, next) {
+                if (!validator.validate('project.application.post', req.body)) {
+                    return next(new errors.BadRequestError('Invalid or missing field'));
+                }
+                const accessGranted = await utilities.checkUserAccess(req.params.projectId, req.session.user.id, ['Administrator', 'Creator']);
+                if (accessGranted === false) {
+                    return (next(new errors.ForbiddenError('Your rank for this project is insufficient')));
+                } else if (accessGranted === null) {
+                    return (next(new errors.ResourceNotFoundError('Project or user not found')));
+                }
+                try {
+                    res.toSend = {
+                        id: await utilities.saveApplication(req.params.projectId, req.body.userId, req.session.user.id),
+                    };
+                } catch (err) {
+                    return (next(helpers.handleErrors(req.log, err)));
+                }
+                return next();
+            },
+        },
+        apply: {
+            async post(req, res, next) {
+
+            },
         },
     },
 });
