@@ -1,8 +1,9 @@
 const errors = require('restify-errors');
 const helpers = require('../utilities/helpers');
 const utilities = require('../utilities/project');
-const ProjectModel = require('mongoose').model('Project');
 const Project = require('../classes/Project');
+const ProjectModel = require('mongoose').model('Project');
+
 
 module.exports = (sessions, validator) => ({
     async post(req, res, next) {
@@ -115,7 +116,19 @@ module.exports = (sessions, validator) => ({
             if (!validator.validate('project.application.post', req.body)) {
                 return next(new errors.BadRequestError('Invalid or missing field'));
             }
-            await utilities.checkUserAccess(req.params.projectId, req.session.user.id, ['Student']);
+            const accessGranted = await utilities.checkUserAccess(req.params.projectId, req.session.user.id, ['Administrator', 'Creator']);
+            if (accessGranted === false) {
+                return (next(new errors.ForbiddenError('Your rank for this project is insufficient')));
+            } else if (accessGranted === null) {
+                return (next(new errors.ResourceNotFoundError('Project or user not found')));
+            }
+            try {
+                res.toSend = {
+                    id: await utilities.saveApplication(req.params.projectId, req.body.userId, req.session.user.id),
+                };
+            } catch (err) {
+                return (next(helpers.handleErrors(req.log, err)));
+            }
             return next();
         },
     },

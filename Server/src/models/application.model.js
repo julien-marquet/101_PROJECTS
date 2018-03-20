@@ -8,12 +8,16 @@ const ApplicationSchema = new Schema({
         required: true,
     },
     userId: {
-        type: Schema.Types.ObjectId,
+        type: Number,
+        required: true,
+    },
+    type: {
+        type: String,
+        enum: ['user', 'project'],
         required: true,
     },
     initiator: {
-        type: String,
-        required: true,
+        type: Number,
     },
 }, {
     timestamps: true,
