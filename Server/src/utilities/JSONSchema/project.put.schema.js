@@ -3,8 +3,14 @@ module.exports = {
     required: [
         'title',
         'description',
+        'activePhase',
     ],
     properties: {
+        activePhase: {
+            type: 'number',
+            minimum: 1,
+            maximum: 3,
+        },
         public: {
             type: 'boolean',
         },

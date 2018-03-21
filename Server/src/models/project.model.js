@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const Phase1Schema = require('../models/schemas/phase1.schema');
 const Phase2Schema = require('../models/schemas/phase2.schema');
 const Phase3Schema = require('../models/schemas/phase3.schema');
-const CollaboratorSchema = require('../models/schemas/collaborator.schema');
 
 const { Schema } = mongoose;
 
@@ -18,7 +17,6 @@ const ProjectSchema = new Schema({
         type: Boolean,
         default: true,
     },
-    collaborators: [CollaboratorSchema],
     repository: String,
     description: String,
     title: {
@@ -53,14 +51,6 @@ ProjectSchema.set('toJSON', {
         const res = {
             ...ret,
             id: ret._id.toString(),
-            collaborators: ret.collaborators.map((collab) => {
-                const newObj = {
-                    ...collab,
-                    id: collab._id,
-                };
-                delete newObj._id;
-                return newObj;
-            }),
             phase: {
                 ...ret.phase[ret.activePhase],
                 id: ret.phase[ret.activePhase]._id,
