@@ -18,10 +18,7 @@ const Phase3Schema = new Schema({
         type: String,
         trim: true,
     },
-    upvotes: {
-        type: Number,
-        default: 0,
-    },
+    upvotes: [Number],
 }, {
     timestamps: true,
 });

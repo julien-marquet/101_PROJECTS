@@ -13,10 +13,7 @@ const Phase2Schema = new Schema({
     releaseDate: {
         type: Date,
     },
-    upvotes: {
-        type: Number,
-        default: 0,
-    },
+    upvotes: [Number],
 }, {
     timestamps: true,
 });

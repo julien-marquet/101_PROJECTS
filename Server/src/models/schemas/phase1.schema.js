@@ -1,7 +1,7 @@
 const { Schema } = require('mongoose');
 
 const Phase1Schema = new Schema({
-    upvotes: { type: Number, default: 0 },
+    upvotes: [Number],
     endedAt: Date,
 }, {
     timestamps: true,
