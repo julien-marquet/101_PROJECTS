@@ -88,6 +88,48 @@ module.exports = (sessions, validator) => ({
         };
         return next();
     },
+    upvote: {
+        async post(req, res, next) {
+            let result;
+            if (!req.params.projectId) {
+                return next(new errors.BadRequestError('Invalid or missing field'));
+            }
+            try {
+                result = await utilities.addUpvote(req.params.projectId, req.session.user.id);
+            } catch (err) {
+                return (next(helpers.handleErrors(req.log, err)));
+            }
+            if (result === null) {
+                return (next(new errors.ResourceNotFoundError('Project not found')));
+            } else if (result === false) {
+                return (next(new errors.BadRequestError('already upvoted')));
+            }
+            res.toSend = {
+                message: 'upvote added',
+            };
+            return next();
+        },
+        async delete(req, res, next) {
+            let result;
+            if (!req.params.projectId) {
+                return next(new errors.BadRequestError('Invalid or missing field'));
+            }
+            try {
+                result = await utilities.removeUpvote(req.params.projectId, req.session.user.id);
+            } catch (err) {
+                return (next(helpers.handleErrors(req.log, err)));
+            }
+            if (result === null) {
+                return (next(new errors.ResourceNotFoundError('Project not found')));
+            } else if (result === false) {
+                return (next(new errors.BadRequestError('not upvoted')));
+            }
+            res.toSend = {
+                message: 'upvote removed',
+            };
+            return next();
+        },
+    },
     application: {
         async get(req, res, next) {
             if (!req.params.projectId) {

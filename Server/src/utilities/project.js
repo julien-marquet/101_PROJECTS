@@ -6,6 +6,31 @@ const CollaboratorModel = mongoose.model('Collaborator');
 const ApplicationModel = mongoose.model('Application');
 
 module.exports = {
+    async addUpvote(projectId, userId) {
+        const project = await ProjectModel.findOne({ _id: mongoose.Types.ObjectId(projectId) });
+        if (project) {
+            if (project.phase[project.activePhase].upvotes.includes(userId)) {
+                return false;
+            }
+            project.phase[project.activePhase].upvotes.push(userId);
+            await project.save();
+            return true;
+        }
+        return null;
+    },
+    async removeUpvote(projectId, userId) {
+        const project = await ProjectModel.findOne({ _id: mongoose.Types.ObjectId(projectId) });
+        if (project) {
+            const index = project.phase[project.activePhase].upvotes.indexOf(userId);
+            if (index === -1) {
+                return false;
+            }
+            project.phase[project.activePhase].upvotes.splice(index, 1);
+            await project.save();
+            return true;
+        }
+        return null;
+    },
     async removeProject(projectId) {
         await ProjectModel.remove({ _id: mongoose.Types.ObjectId(projectId) });
         await CollaboratorModel.remove({ projectId: mongoose.Types.ObjectId(projectId) });

@@ -54,6 +54,7 @@ ProjectSchema.set('toJSON', {
             phase: {
                 ...ret.phase[ret.activePhase],
                 id: ret.phase[ret.activePhase]._id,
+                nbUpvotes: ret.phase[ret.activePhase].upvotes.length,
             },
         };
         delete res.phase._id;

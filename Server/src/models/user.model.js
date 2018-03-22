@@ -16,7 +16,7 @@ UserSchema.set('toJSON', {
     transform: (doc, ret) => {
         const res = {
             ...ret,
-            id: ret._id.toString(),
+            id: ret._id,
         };
         delete res.__v;
         delete res._id;
