@@ -6,6 +6,15 @@ const CollaboratorModel = mongoose.model('Collaborator');
 const ApplicationModel = mongoose.model('Application');
 
 module.exports = {
+    async getListProjects(user) {
+        let result;
+        if (user === null) {
+            result = await ProjectModel.find({ public: true });
+        } else {
+            result = await ProjectModel.find({});
+        }
+        return result;
+    },
     async addUpvote(projectId, userId) {
         const project = await ProjectModel.findOne({ _id: mongoose.Types.ObjectId(projectId) });
         if (project) {

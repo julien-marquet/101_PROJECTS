@@ -88,6 +88,18 @@ module.exports = (sessions, validator) => ({
         };
         return next();
     },
+    list: {
+        async get(req, res, next) {
+            let result;
+            try {
+                result = await utilities.getListProjects(req.session ? req.session.user : null);
+            } catch (err) {
+                return (next(helpers.handleErrors(req.log, err)));
+            }
+            res.toSend = result;
+            return next();
+        },
+    },
     upvote: {
         async post(req, res, next) {
             let result;
