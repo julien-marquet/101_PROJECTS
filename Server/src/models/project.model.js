@@ -45,23 +45,4 @@ const ProjectSchema = new Schema({
     timestamps: true,
 });
 
-ProjectSchema.set('toJSON', {
-    virtuals: true,
-    transform: (doc, ret) => {
-        const res = {
-            ...ret,
-            id: ret._id.toString(),
-            phase: {
-                ...ret.phase[ret.activePhase],
-                id: ret.phase[ret.activePhase]._id,
-                nbUpvotes: ret.phase[ret.activePhase].upvotes.length,
-            },
-        };
-        delete res.phase._id;
-        delete res.__v;
-        delete res._id;
-        return res;
-    },
-});
-
 module.exports = mongoose.model('Project', ProjectSchema);

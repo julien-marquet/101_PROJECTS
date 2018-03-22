@@ -1,4 +1,5 @@
 const utilities = require('../utilities/session');
+const modelUtilities = require('../utilities/modelUtilities');
 const AdminModel = require('mongoose').model('Admin');
 
 class Sessions {
@@ -8,8 +9,8 @@ class Sessions {
         this.admins = [];
     }
     async init() {
-        this.admins = await AdminModel.find();
-        this.admins = this.admins.map(o => o.toJSON());
+        this.admins = await AdminModel.find().lean();
+        this.admins = this.admins.map(o => modelUtilities.admin.toJSON(o));
     }
     async refreshSession(token) {
         const oldSession = this.sessions[token];

@@ -27,7 +27,7 @@ module.exports = (sessions, validator) => ({
         try {
             if (await utilities.projectExist(req.params.projectId) === false) {
                 return (next(new errors.ResourceNotFoundError('Project not found')));
-            } else if (await utilities.checkUserAccess(req.params.projectId, req.session.user.id, ['Creator']) !== true) {
+            } else if (await utilities.checkUserAccess(req.params.projectId, req.session.user, ['Creator']) !== true) {
                 return (next(new errors.ForbiddenError('Your rank for this project is insufficient')));
             }
         } catch (err) {
@@ -72,7 +72,7 @@ module.exports = (sessions, validator) => ({
         try {
             if (await utilities.projectExist(req.params.projectId) === false) {
                 return (next(new errors.ResourceNotFoundError('Project not found')));
-            } else if (await utilities.checkUserAccess(req.params.projectId, req.session.user.id, ['Creator', 'Administrator']) !== true) {
+            } else if (await utilities.checkUserAccess(req.params.projectId, req.session.user, ['Creator', 'Administrator']) !== true) {
                 return (next(new errors.ForbiddenError('Your rank for this project is insufficient')));
             }
         } catch (err) {
@@ -156,6 +156,26 @@ module.exports = (sessions, validator) => ({
             res.toSend = result;
             return next();
         },
+        accept: {
+            async post(req, res, next) {
+                if (!req.params.applicationId) {
+                    return next(new errors.BadRequestError('Invalid or missing field'));
+                }
+            },
+        },
+        reject: {
+            async post(req, res, next) {
+                let result;
+                if (!req.params.applicationId) {
+                    return next(new errors.BadRequestError('Invalid or missing field'));
+                }
+                try {
+                    result = await utilities.removeApplication(req.params.projectId);
+                } catch (err) {
+                    return (next(helpers.handleErrors(req.log, err)));
+                }
+            },
+        },
         invite: {
             async post(req, res, next) {
                 if (!req.params.projectId) {
@@ -165,7 +185,7 @@ module.exports = (sessions, validator) => ({
                     return next(new errors.BadRequestError('Invalid or missing field'));
                 }
                 try {
-                    const accessGranted = await utilities.checkUserAccess(req.params.projectId, req.session.user.id, ['Administrator', 'Creator']);
+                    const accessGranted = await utilities.checkUserAccess(req.params.projectId, req.session.user, ['Administrator', 'Creator']);
                     if (accessGranted === false) {
                         return (next(new errors.ForbiddenError('Your rank for this project is insufficient')));
                     } else if (accessGranted !== true) {

@@ -2,17 +2,18 @@ const UserModel = require('mongoose').model('User');
 const { api42Endpoint } = require('../configs/global.config');
 const rp = require('request-promise');
 const RequestError = require('../classes/RequestError');
+const modelUtilities = require('../utilities/modelUtilities');
 
 class User {
     constructor() {
         this.infos = {};
     }
     async init(id) {
-        const obj = await UserModel.findById({ _id: id });
+        const obj = await UserModel.findById({ _id: id }).lean();
         if (obj === null) {
             return (false);
         }
-        this.infos = obj.toJSON();
+        this.infos = modelUtilities.user.toJSON(obj);
         return (true);
     }
     async create(accessToken) {
@@ -37,7 +38,7 @@ class User {
             campus: userInfo.campus[0].id,
         });
         const obj = await dbUser.save();
-        this.infos = (obj.toJSON());
+        this.infos = modelUtilities.user.toJSON(obj);
         return (true);
     }
 }

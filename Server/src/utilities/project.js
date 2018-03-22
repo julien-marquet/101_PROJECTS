@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const CustomError = require('../classes/CustomError');
+const modelUtilities = require('../utilities/modelUtilities');
 
 const ProjectModel = mongoose.model('Project');
 const CollaboratorModel = mongoose.model('Collaborator');
@@ -9,11 +10,11 @@ module.exports = {
     async getListProjects(user) {
         let result;
         if (user === null) {
-            result = await ProjectModel.find({ public: true });
+            result = await ProjectModel.find({ public: true }, 'title description').lean();
         } else {
-            result = await ProjectModel.find({});
+            result = await ProjectModel.find({}, 'title description').lean();
         }
-        return result;
+        return result.map(o => modelUtilities.project.list.toJSON(o));
     },
     async addUpvote(projectId, userId) {
         const project = await ProjectModel.findOne({ _id: mongoose.Types.ObjectId(projectId) });
@@ -62,11 +63,11 @@ module.exports = {
         return true;
     },
     async getProject(projectId, user) {
-        let project = await ProjectModel.findById({ _id: projectId });
+        let project = await ProjectModel.findById({ _id: projectId }).lean();
         if (project === null) {
             return (null);
         }
-        project = project.toJSON();
+        project = modelUtilities.project.toJSON(project);
         if (!user && project.public === false) {
             throw CustomError('Access forbidden, project isn\'t public', 403);
         }
@@ -103,12 +104,15 @@ module.exports = {
         }
         return projectId;
     },
-    async checkUserAccess(projectId, userId, ranks) {
+    async checkUserAccess(projectId, user, ranks) {
         let userRank;
+        if (user && user.rank === 'Admin') {
+            return true;
+        }
         try {
             userRank = await CollaboratorModel.findOne({
                 projectId: mongoose.Types.ObjectId(projectId),
-                userId,
+                userId: user.id,
             }).select('rank').lean();
         } catch (err) {
             return null;
@@ -160,7 +164,7 @@ module.exports = {
         return _id;
     },
     async getProjectApplication(projectId) {
-        const res = await ApplicationModel.find({ projectId: mongoose.Types.ObjectId(projectId) });
-        return res.map(o => o.toJSON());
+        const res = await ApplicationModel.find({ projectId: mongoose.Types.ObjectId(projectId) }).lean();
+        return res.map(o => modelUtilities.project.toJSON(o));
     },
 };
