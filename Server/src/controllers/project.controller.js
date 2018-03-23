@@ -156,6 +156,28 @@ module.exports = (sessions, validator) => ({
             res.toSend = result;
             return next();
         },
+        cancel: {
+            async post(req, res, next) {
+                let result;
+                if (!req.params.applicationId) {
+                    return next(new errors.BadRequestError('Invalid or missing field'));
+                }
+                try {
+                    result = await utilities.cancelProjectApplication(req.params.applicationId, req.session.user.id);
+                } catch (err) {
+                    return (next(helpers.handleErrors(req.log, err)));
+                }
+                if (result === null) {
+                    return (next(new errors.ResourceNotFoundError('Application not found')));
+                } else if (result === false) {
+                    return (next(new errors.ForbiddenError('You have no right to do this')));
+                }
+                res.toSend = {
+                    message: 'Application canceled',
+                };
+                return next();
+            },
+        },
         accept: {
             async post(req, res, next) {
                 if (!req.params.applicationId) {
@@ -170,10 +192,19 @@ module.exports = (sessions, validator) => ({
                     return next(new errors.BadRequestError('Invalid or missing field'));
                 }
                 try {
-                    result = await utilities.removeApplication(req.params.projectId);
+                    result = await utilities.rejectProjectApplication(req.params.applicationId, req.session.user.id);
                 } catch (err) {
                     return (next(helpers.handleErrors(req.log, err)));
                 }
+                if (result === null) {
+                    return (next(new errors.ResourceNotFoundError('Application not found')));
+                } else if (result === false) {
+                    return (next(new errors.ForbiddenError('You have no right to do this')));
+                }
+                res.toSend = {
+                    message: 'Application rejected',
+                };
+                return next();
             },
         },
         invite: {
