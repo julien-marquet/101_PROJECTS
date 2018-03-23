@@ -1,7 +1,7 @@
 module.exports = (api, controller, access, sender) => {
     api.post('project/invite/:projectId', access.check(['Student', 'Admin']), controller.invite.post, sender);
     api.post('project/apply/:projectId', access.check(['Student', 'Admin']), controller.apply.post, sender);
-    api.get('project/application/:projectId', access.check(['Student', 'Admin']), controller.application.get, sender);
+    api.get('project/applications/:projectId', access.check(['Student', 'Admin']), controller.applications.get, sender);
     api.post('project/upvote/:projectId', access.check(['Student', 'Admin']), controller.upvote.post, sender);
     api.del('project/upvote/:projectId', access.check(['Student', 'Admin']), controller.upvote.delete, sender);
     api.get('project/list', access.check(['*']), controller.list.get, sender);

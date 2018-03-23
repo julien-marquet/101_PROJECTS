@@ -199,7 +199,7 @@ module.exports = (sessions, validator) => ({
             return next();
         },
     },
-    application: {
+    applications: {
         async get(req, res, next) {
             if (!req.params.projectId) {
                 return next(new errors.BadRequestError('Invalid or missing field'));
