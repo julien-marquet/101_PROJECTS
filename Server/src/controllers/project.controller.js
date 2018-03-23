@@ -180,9 +180,25 @@ module.exports = (sessions, validator) => ({
         },
         accept: {
             async post(req, res, next) {
+                console.log('bla');
+                let id;
                 if (!req.params.applicationId) {
                     return next(new errors.BadRequestError('Invalid or missing field'));
                 }
+                try {
+                    id = await utilities.acceptProjectApplication(req.params.applicationId, req.session.user.id);
+                } catch (err) {
+                    return (next(helpers.handleErrors(req.log, err)));
+                }
+                if (id === null) {
+                    return (next(new errors.ResourceNotFoundError('Application not found')));
+                } else if (id === false) {
+                    return (next(new errors.ForbiddenError('You have no right to do this')));
+                }
+                res.toSend = {
+                    id,
+                };
+                return next();
             },
         },
         reject: {

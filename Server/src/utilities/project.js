@@ -199,4 +199,30 @@ module.exports = {
         }
         return false;
     },
+    async addCollaborator(application) {
+        const collaboratorId = mongoose.Types.ObjectId();
+        const collaborator = new CollaboratorModel({
+            _id: collaboratorId,
+            userId: application.userId,
+            projectId: mongoose.Types.ObjectId(application.projectId),
+            rank: 'Developer',
+        });
+        await collaborator.save();
+        await application.remove();
+        return collaboratorId;
+    },
+    async acceptProjectApplication(applicationId, userId) {
+        const app = await ApplicationModel.findById({ _id: applicationId });
+        if (app === null) {
+            return (null);
+        }
+        if (app.type === 'project') {
+            if (userId === app.userId) {
+                return this.addCollaborator(app);
+            }
+        } else if (this.checkUserAccess(app.projectId, userId, ['Creator', 'Administrator'])) {
+            return this.addCollaborator(app);
+        }
+        return false;
+    },
 };
