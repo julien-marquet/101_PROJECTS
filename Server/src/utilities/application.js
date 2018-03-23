@@ -83,7 +83,7 @@ module.exports = {
     },
     async getProjectApplication(projectId) {
         const res = await ApplicationModel.find({ projectId: mongoose.Types.ObjectId(projectId) }).lean();
-        return res.map(o => modelUtilities.project.toJSON(o));
+        return res.map(o => modelUtilities.application.toJSON(o));
     },
     async getApplication(applicationId) {
         return ApplicationModel.findById({ _id: applicationId }).lean();
