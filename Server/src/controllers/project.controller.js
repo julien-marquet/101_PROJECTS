@@ -204,7 +204,6 @@ module.exports = (sessions, validator) => ({
             if (!req.params.projectId) {
                 return next(new errors.BadRequestError('Invalid or missing field'));
             }
-            console.log(req.params)
             let result;
             try {
                 result = await applicationUtilities.getProjectApplication(req.params.projectId);
