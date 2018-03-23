@@ -2,6 +2,7 @@ const errors = require('restify-errors');
 const helpers = require('../utilities/helpers');
 const utilities = require('../utilities/project');
 const userUtilities = require('../utilities/user');
+const applicationUtilities = require('../utilities/application');
 
 module.exports = (sessions, validator) => ({
     async post(req, res, next) {
@@ -142,6 +143,62 @@ module.exports = (sessions, validator) => ({
             return next();
         },
     },
+    invite: {
+        async post(req, res, next) {
+            if (!req.params.projectId) {
+                return next(new errors.BadRequestError('Invalid or missing field'));
+            }
+            if (!validator.validate('project.application.post', req.body)) {
+                return next(new errors.BadRequestError('Invalid or missing field'));
+            }
+            try {
+                const accessGranted = await utilities.checkUserAccess(req.params.projectId, req.session.user, ['Administrator', 'Creator']);
+                if (accessGranted === false) {
+                    return (next(new errors.ForbiddenError('Your rank for this project is insufficient')));
+                } else if (accessGranted !== true) {
+                    return (next(new errors.ResourceNotFoundError('Project or user not found')));
+                } else if (await userUtilities.userExists(req.body.userId) !== true) {
+                    return (next(new errors.ResourceNotFoundError('User not found')));
+                } else if (await utilities.isCollaborator(req.params.projectId, req.body.userId) !== false) {
+                    return (next(new errors.BadRequestError('User already a collaborator')));
+                }
+            } catch (err) {
+                return (next(helpers.handleErrors(req.log, err)));
+            }
+            try {
+                res.toSend = {
+                    id: await applicationUtilities.saveProjectApplication(req.params.projectId, req.body.userId, req.session.user.id),
+                };
+            } catch (err) {
+                return (next(helpers.handleErrors(req.log, err)));
+            }
+            return next();
+        },
+    },
+    apply: {
+        async post(req, res, next) {
+            if (!req.params.projectId) {
+                return next(new errors.BadRequestError('Invalid or missing field'));
+            }
+            try {
+                if (await utilities.projectExist(req.params.projectId) !== true) {
+                    return (next(new errors.ResourceNotFoundError('Project not found')));
+                } else if (await utilities.isCollaborator(req.params.projectId, req.session.user.id) !== false) {
+                    return (next(new errors.BadRequestError('User already a collaborator')));
+                }
+            } catch (err) {
+                return (next(helpers.handleErrors(req.log, err)));
+            }
+            try {
+                res.toSend = {
+                    id: await applicationUtilities.saveUserApplication(req.params.projectId, req.body.userId, req.session.user.id),
+                };
+            } catch (err) {
+                return (next(helpers.handleErrors(req.log, err)));
+            }
+            return next();
+        },
+    },
     application: {
         async get(req, res, next) {
             if (!req.params.projectId) {
@@ -149,135 +206,12 @@ module.exports = (sessions, validator) => ({
             }
             let result;
             try {
-                result = await utilities.getProjectApplication(req.params.projectId);
+                result = await applicationUtilities.getProjectApplication(req.params.projectId);
             } catch (err) {
                 return (next(helpers.handleErrors(req.log, err)));
             }
             res.toSend = result;
             return next();
-        },
-        cancel: {
-            async post(req, res, next) {
-                let result;
-                if (!req.params.applicationId) {
-                    return next(new errors.BadRequestError('Invalid or missing field'));
-                }
-                try {
-                    result = await utilities.cancelProjectApplication(req.params.applicationId, req.session.user.id);
-                } catch (err) {
-                    return (next(helpers.handleErrors(req.log, err)));
-                }
-                if (result === null) {
-                    return (next(new errors.ResourceNotFoundError('Application not found')));
-                } else if (result === false) {
-                    return (next(new errors.ForbiddenError('You have no right to do this')));
-                }
-                res.toSend = {
-                    message: 'Application canceled',
-                };
-                return next();
-            },
-        },
-        accept: {
-            async post(req, res, next) {
-                console.log('bla');
-                let id;
-                if (!req.params.applicationId) {
-                    return next(new errors.BadRequestError('Invalid or missing field'));
-                }
-                try {
-                    id = await utilities.acceptProjectApplication(req.params.applicationId, req.session.user.id);
-                } catch (err) {
-                    return (next(helpers.handleErrors(req.log, err)));
-                }
-                if (id === null) {
-                    return (next(new errors.ResourceNotFoundError('Application not found')));
-                } else if (id === false) {
-                    return (next(new errors.ForbiddenError('You have no right to do this')));
-                }
-                res.toSend = {
-                    id,
-                };
-                return next();
-            },
-        },
-        reject: {
-            async post(req, res, next) {
-                let result;
-                if (!req.params.applicationId) {
-                    return next(new errors.BadRequestError('Invalid or missing field'));
-                }
-                try {
-                    result = await utilities.rejectProjectApplication(req.params.applicationId, req.session.user.id);
-                } catch (err) {
-                    return (next(helpers.handleErrors(req.log, err)));
-                }
-                if (result === null) {
-                    return (next(new errors.ResourceNotFoundError('Application not found')));
-                } else if (result === false) {
-                    return (next(new errors.ForbiddenError('You have no right to do this')));
-                }
-                res.toSend = {
-                    message: 'Application rejected',
-                };
-                return next();
-            },
-        },
-        invite: {
-            async post(req, res, next) {
-                if (!req.params.projectId) {
-                    return next(new errors.BadRequestError('Invalid or missing field'));
-                }
-                if (!validator.validate('project.application.post', req.body)) {
-                    return next(new errors.BadRequestError('Invalid or missing field'));
-                }
-                try {
-                    const accessGranted = await utilities.checkUserAccess(req.params.projectId, req.session.user, ['Administrator', 'Creator']);
-                    if (accessGranted === false) {
-                        return (next(new errors.ForbiddenError('Your rank for this project is insufficient')));
-                    } else if (accessGranted !== true) {
-                        return (next(new errors.ResourceNotFoundError('Project or user not found')));
-                    } else if (await userUtilities.userExists(req.body.userId) !== true) {
-                        return (next(new errors.ResourceNotFoundError('User not found')));
-                    } else if (await utilities.isCollaborator(req.params.projectId, req.body.userId) !== false) {
-                        return (next(new errors.BadRequestError('User already a collaborator')));
-                    }
-                } catch (err) {
-                    return (next(helpers.handleErrors(req.log, err)));
-                }
-                try {
-                    res.toSend = {
-                        id: await utilities.saveProjectApplication(req.params.projectId, req.body.userId, req.session.user.id),
-                    };
-                } catch (err) {
-                    return (next(helpers.handleErrors(req.log, err)));
-                }
-                return next();
-            },
-        },
-        apply: {
-            async post(req, res, next) {
-                if (!req.params.projectId) {
-                    return next(new errors.BadRequestError('Invalid or missing field'));
-                }
-                try {
-                    if (await utilities.projectExist(req.params.projectId) !== true) {
-                        return (next(new errors.ResourceNotFoundError('Project not found')));
-                    } else if (await utilities.isCollaborator(req.params.projectId, req.session.user.id) !== false) {
-                        return (next(new errors.BadRequestError('User already a collaborator')));
-                    }
-                } catch (err) {
-                    return (next(helpers.handleErrors(req.log, err)));
-                }
-                try {
-                    res.toSend = {
-                        id: await utilities.saveUserApplication(req.params.projectId, req.body.userId, req.session.user.id),
-                    };
-                } catch (err) {
-                    return (next(helpers.handleErrors(req.log, err)));
-                }
-                return next();
-            },
         },
     },
 });
