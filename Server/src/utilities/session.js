@@ -1,6 +1,6 @@
 const { api42Endpoint, redirectUri } = require('../configs/global.config');
 const rp = require('request-promise');
-const User = require('../classes/User');
+const utilities = require('../utilities/user');
 const RequestError = require('../classes/RequestError');
 
 module.exports = {
@@ -66,21 +66,16 @@ module.exports = {
         } catch (err) {
             throw new RequestError('GetUserToken', `${err.name} : ${err.error.error}`, err.statusCode);
         }
-        const user = new User();
-        const userExist = await user.init(tokenInfo.resource_owner_id);
-        if (userExist) {
+        let user = await utilities.getUser(tokenInfo.resource_owner_id);
+        if (user != null) {
             return ({
-                user: {
-                    ...user.infos,
-                },
+                user,
                 token,
             });
         }
-        await user.create(token.access_token);
+        user = await utilities.createUser(token.access_token);
         return ({
-            user: {
-                ...user.infos,
-            },
+            user,
             token,
         });
     },
