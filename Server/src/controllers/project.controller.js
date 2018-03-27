@@ -89,6 +89,48 @@ module.exports = (sessions, validator) => ({
         };
         return next();
     },
+    transferOwnership: {
+        async post(req, res, next) {
+            if (!validator.validate('project.transferOwnership.post', req.body) || req.body.userId === req.session.user.id) {
+                return next(new errors.BadRequestError('Invalid or missing field'));
+            }
+            let collab1;
+            let collab2;
+            try {
+                collab1 = await utilities.getCollaborator(req.session.user.id, req.params.projectId);
+            } catch (err) {
+                return (next(helpers.handleErrors(req.log, err)));
+            }
+            if (!collab1) {
+                return (next(new errors.ForbiddenError('Not a member')));
+            }
+            if (!await utilities.checkUserAccess(req.params.projectId, req.session.user.id, ['Creator'])) {
+                return (next(new errors.ForbiddenError('Your rank for this project is insufficient')));
+            }
+            try {
+                collab2 = await utilities.getCollaborator(req.body.userId, req.params.projectId);
+            } catch (err) {
+                return (next(helpers.handleErrors(req.log, err)));
+            }
+            if (!collab2) {
+                return (next(new errors.ResourceNotFoundError('User not a member')));
+            }
+            try {
+                await utilities.updateRank(collab1, 'Administrator');
+            } catch (err) {
+                return (next(helpers.handleErrors(req.log, err)));
+            }
+            try {
+                await utilities.updateRank(collab2, 'Creator');
+            } catch (err) {
+                return (next(helpers.handleErrors(req.log, err)));
+            }
+            res.toSend = {
+                message: 'transfer succeeded',
+            };
+            return next();
+        },
+    },
     list: {
         async get(req, res, next) {
             let result;

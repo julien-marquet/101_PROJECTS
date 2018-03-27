@@ -117,7 +117,7 @@ module.exports = {
         } catch (err) {
             return null;
         } try {
-            return ranks.includes(userRank.rank);
+            return userRank === null ? false : ranks.includes(userRank.rank);
         } catch (err) {
             return false;
         }
@@ -146,5 +146,11 @@ module.exports = {
         await collaborator.save();
         await application.remove();
         return collaboratorId;
+    },
+    async getCollaborator(userId, projectId) {
+        return CollaboratorModel.findOne({ projectId: mongoose.Types.ObjectId(projectId), userId }, '_id');
+    },
+    async updateRank(_id, newRank) {
+        return CollaboratorModel.findOneAndUpdate({ _id }, { $set: { rank: newRank } });
     },
 };

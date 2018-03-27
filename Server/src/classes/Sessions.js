@@ -47,6 +47,11 @@ class Sessions {
     getSession(token) {
         return (this.sessions[token] || null);
     }
+    deleteSession(token) {
+        if (this.sessions[token]) {
+            delete this.sessions[token];
+        }
+    }
     getSessionStatus(token) {
         const session = this.sessions[token];
         if (!session) {

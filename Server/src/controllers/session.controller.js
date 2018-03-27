@@ -18,8 +18,15 @@ module.exports = sessions => ({
                 ...res.toSend,
                 session: userSession,
             };
-            return (next());
+            return next();
         }
         return (next(new errors.BadRequestError('Missing parameter')));
+    },
+    async delete(req, res, next) {
+        sessions.deleteSession(req.session.token.access_token);
+        res.toSend = {
+            message: 'Session succesfully deleted',
+        };
+        return next();
     },
 });
