@@ -89,9 +89,33 @@ module.exports = (sessions, validator) => ({
         };
         return next();
     },
+    collaborators: {
+        async get(req, res, next) {
+            if (!req.params.projectId) {
+                return next(new errors.BadRequestError('Invalid or missing field'));
+            }
+            let result;
+            if (!req.session || req.session.user) {
+                try {
+                    if (!await utilities.projectIsPublic(req.params.projectId)) {
+                        return (next(new errors.ForbiddenError('Project is not public')));
+                    }
+                } catch (err) {
+                    return (next(helpers.handleErrors(req.log, err)));
+                }
+            }
+            try {
+                result = await utilities.getListCollaborators(req.params.projectId);
+            } catch (err) {
+                return (next(helpers.handleErrors(req.log, err)));
+            }
+            res.toSend = result;
+            return next();
+        },
+    },
     transferOwnership: {
         async post(req, res, next) {
-            if (!validator.validate('project.transferOwnership.post', req.body) || req.body.userId === req.session.user.id) {
+            if (!req.params.projectId || !validator.validate('project.transferOwnership.post', req.body) || req.body.userId === req.session.user.id) {
                 return next(new errors.BadRequestError('Invalid or missing field'));
             }
             let collab1;

@@ -82,4 +82,26 @@ module.exports = {
             return res;
         },
     },
+    collaborator: {
+        list: {
+            toJSON(input) {
+                const res = {
+                    ...input,
+                    id: input._id,
+                };
+                delete res.__v;
+                delete res._id;
+                return res;
+            },
+        },
+        toJSON(input) {
+            const res = {
+                ...input,
+                id: input._id,
+            };
+            delete res.__v;
+            delete res._id;
+            return res;
+        },
+    },
 };

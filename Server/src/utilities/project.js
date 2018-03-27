@@ -69,7 +69,7 @@ module.exports = {
         }
         project = modelUtilities.project.toJSON(project);
         if (!user && project.public === false) {
-            throw CustomError('Access forbidden, project isn\'t public', 403);
+            throw new CustomError('Access forbidden, project isn\'t public', 403);
         }
         return project;
     },
@@ -152,5 +152,12 @@ module.exports = {
     },
     async updateRank(_id, newRank) {
         return CollaboratorModel.findOneAndUpdate({ _id }, { $set: { rank: newRank } });
+    },
+    async projectIsPublic(projectId) {
+        return (await ProjectModel.count({ _id: mongoose.Types.ObjectId(projectId), public: true }) > 0);
+    },
+    async getListCollaborators(projectId) {
+        const result = await CollaboratorModel.find({ projectId }, '-projectId').lean();
+        return result.map(o => modelUtilities.collaborator.list.toJSON(o));
     },
 };
