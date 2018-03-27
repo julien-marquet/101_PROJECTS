@@ -1,5 +1,5 @@
-Server/node_modules/
+*node_modules
+*package-lock.json
 Server/server.pid
-Server/package-lock.json
 Server/logs/
 Server/.env
