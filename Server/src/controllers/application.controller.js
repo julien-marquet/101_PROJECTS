@@ -16,6 +16,18 @@ module.exports = () => ({
         res.toSend = result;
         return next();
     },
+    me: {
+        async get(req, res, next) {
+            let result;
+            try {
+                result = await utilities.getMyApplications(req.session.user.id);
+            } catch (err) {
+                return (next(helpers.handleErrors(req.log, err)));
+            }
+            res.toSend = result;
+            return next();
+        },
+    },
     cancel: {
         async post(req, res, next) {
             let result;

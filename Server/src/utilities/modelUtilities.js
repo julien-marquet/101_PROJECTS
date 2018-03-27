@@ -11,6 +11,17 @@ module.exports = {
         },
     },
     application: {
+        list: {
+            toJSON(input) {
+                const res = {
+                    ...input,
+                    id: input._id.toString(),
+                };
+                delete res.__v;
+                delete res._id;
+                return res;
+            },
+        },
         toJSON(input) {
             const res = {
                 ...input,

@@ -6,6 +6,10 @@ const modelUtilities = require('../utilities/modelUtilities');
 const ApplicationModel = mongoose.model('Application');
 
 module.exports = {
+    async getMyApplications(userId) {
+        const res = await ApplicationModel.find({ userId }).lean();
+        return res.map(o => modelUtilities.application.list.toJSON(o));
+    },
     async rejectProjectApplication(applicationId, userId) {
         const app = await ApplicationModel.findById({ _id: applicationId });
         if (app === null) {
@@ -83,7 +87,7 @@ module.exports = {
     },
     async getProjectApplication(projectId) {
         const res = await ApplicationModel.find({ projectId: mongoose.Types.ObjectId(projectId) }).lean();
-        return res.map(o => modelUtilities.application.toJSON(o));
+        return res.map(o => modelUtilities.application.list.toJSON(o));
     },
     async getApplication(applicationId) {
         return ApplicationModel.findById({ _id: applicationId }).lean();
