@@ -35,6 +35,16 @@
 		"react/jsx-uses-react": 2,
 		"react/jsx-uses-vars": 2,
 		"eol-last": ["error", "always"],
-		"no-duplicate-imports": ["error", {}]
+		"no-duplicate-imports": ["error", {}],
+		"prefer-const": ["error", {
+			"destructuring": "any"
+		}],
+		"prefer-arrow-callback": ["error", {}],
+		"no-var": "error",
+		"camelcase": ["error"],
+		"no-lonely-if": "error",
+		"no-use-before-define": ["error"],
+		"radix": "error",
+		"eqeqeq": "error"
     }
 }
