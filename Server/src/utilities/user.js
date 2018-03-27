@@ -1,4 +1,5 @@
 const UserModel = require('mongoose').model('User');
+const CollaboratorModel = require('mongoose').model('Collaborator');
 const { api42Endpoint } = require('../configs/global.config');
 const rp = require('request-promise');
 const RequestError = require('../classes/RequestError');
@@ -42,5 +43,9 @@ module.exports = {
         });
         const obj = await dbUser.save();
         return (modelUtilities.user.toJSON(obj));
+    },
+    async getProjectsUser(userId) {
+        const result = await CollaboratorModel.find({ userId }, 'projectId').lean();
+        return result.map(o => modelUtilities.collaborator.list.toJSON(o));
     },
 };

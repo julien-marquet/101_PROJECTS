@@ -33,4 +33,19 @@ module.exports = () => ({
             return next();
         },
     },
+    projects: {
+        async get(req, res, next) {
+            let result;
+            if (!req.params.userId) {
+                return next(new errors.BadRequestError('Invalid or missing field'));
+            }
+            try {
+                result = await utilities.getProjectsUser(req.params.userId);
+            } catch (err) {
+                return (next(helpers.handleErrors(req.log, err)));
+            }
+            res.toSend = result;
+            return next();
+        },
+    },
 });
