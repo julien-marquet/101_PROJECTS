@@ -5,6 +5,10 @@ const RequestError = require('../classes/RequestError');
 const modelUtilities = require('../utilities/modelUtilities');
 
 module.exports = {
+    async getListUsers() {
+        const result = await UserModel.find({}, 'title description').lean();
+        return result.map(o => modelUtilities.user.list.toJSON(o));
+    },
     async userExists(userId) {
         return (await UserModel.count({ _id: userId }) > 0);
     },
