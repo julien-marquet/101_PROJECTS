@@ -33,6 +33,8 @@
             "always"
         ],
 		"react/jsx-uses-react": 2,
-		"react/jsx-uses-vars": 2
+		"react/jsx-uses-vars": 2,
+		"eol-last": ["error", "always"],
+		"no-duplicate-imports": ["error", {}]
     }
 }
