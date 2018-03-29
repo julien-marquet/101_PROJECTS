@@ -5,8 +5,8 @@
   "dependencies": {
     "bootstrap": "^4.0.0",
     "inferno": "^5.0.1",
-    "inferno-bootstrap": "^5.0.0",
     "inferno-redux": "^5.0.1",
+    "inferno-bootstrap": "https://github.com/Grivel-l/inferno-bootstrap/tarball/master",
     "inferno-scripts": "6.3.0",
     "jquery": "^1.9.1",
     "node-sass-chokidar": "^1.2.2",
