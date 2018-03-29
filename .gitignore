@@ -3,3 +3,4 @@
 Server/server.pid
 Server/logs/
 Server/.env
+*.css
