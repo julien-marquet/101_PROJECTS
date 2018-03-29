@@ -3,9 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "bootstrap": "^4.0.0",
     "inferno": "^5.0.1",
-    "inferno-bootstrap": "git+ssh://git@github.com/Grivel-l/inferno-bootstrap.git",
     "inferno-redux": "^5.0.1",
     "inferno-scripts": "6.3.0",
     "jquery": "^1.9.1",
