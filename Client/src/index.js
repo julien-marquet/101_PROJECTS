@@ -1,3 +1,5 @@
+import "bootstrap";
+
 import {render} from "inferno";
 import {Provider} from "inferno-redux";
 import createSagaMiddleware from "redux-saga";
@@ -6,7 +8,6 @@ import {
     applyMiddleware,
     compose
 } from "redux";
-
 import reducers from "./app/reducers/index";
 import sagas from "./app/sagas/index";
 import App from "./app/components/App";
