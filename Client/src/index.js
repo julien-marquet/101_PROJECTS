@@ -9,7 +9,7 @@ import {
 
 import reducers from "./app/reducers/index";
 import sagas from "./app/sagas/index";
-import App from "./App";
+import App from "./app/components/App";
 import "./index.css";
 
 const sagaMiddleware = createSagaMiddleware();
