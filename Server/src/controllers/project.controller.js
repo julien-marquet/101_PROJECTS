@@ -64,10 +64,7 @@ module.exports = (sessions, validator) => ({
         return next();
     },
     async put(req, res, next) {
-        if (!req.params.projectId) {
-            return next(new errors.BadRequestError('Invalid or missing field'));
-        }
-        if (!validator.validate('project.put', req.body)) {
+        if (!req.params.projectId || !validator.validate('project.put', req.body)) {
             return next(new errors.BadRequestError('Invalid or missing field'));
         }
         try {
