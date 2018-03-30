@@ -1,6 +1,7 @@
 .allProjects {
     background-color: orange;
     height: 100%;
+    padding: 2rem;
 }
 
 .projectBox {
@@ -13,9 +14,8 @@
     background-color: green;
 }
 
-.projectRow {
-    background-color: orange;
-    padding-top: 1rem;
+.projectRow:not(:first-child) {
+    padding-top: 2rem;
 }
 
 .projectCol {

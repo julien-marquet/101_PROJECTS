@@ -3,6 +3,7 @@ import {Component} from "inferno";
 import "../../css/general.css";
 import Projects from "../containers/projects/projects";
 import Header from "./Header";
+import Footer from "./Footer";
 
 class App extends Component {
     render() {
@@ -12,6 +13,7 @@ class App extends Component {
                 <div className="container wrapper">
                     <Projects />
                 </div>
+                <Footer />
             </div>
         );
     }
