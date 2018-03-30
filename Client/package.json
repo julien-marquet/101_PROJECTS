@@ -17,7 +17,7 @@
   },
   "scripts": {
     "build-css": "node-sass-chokidar src/scss -o src/css",
-    "watch-css": "npm run build-css node-sass-chokidar src/scss -o src/css --watch --recursive",
+    "watch-css": "npm run build-css && node-sass-chokidar src/scss -o src/css --watch --recursive",
     "start-js": "inferno-scripts start",
     "start": "npm-run-all -p watch-css start-js",
     "build-js": "inferno-scripts build",
