@@ -1,43 +1,62 @@
 require('dotenv').config();
 const restify = require('restify');
 const npid = require('npid');
+const corsMiddleware = require('restify-cors-middleware');
 
-const {name, version, base_url, port} = require('./configs/global.config');
+const {
+    name,
+    version,
+    baseUrl,
+    port,
+} = require('./configs/global.config');
 const log = require('./modules/logger')();
 
 const api = restify.createServer({
     log,
     name,
     version,
-    url: base_url
+    url: baseUrl,
 });
+const cors = corsMiddleware({
+    preflightMaxAge: 5,
+    origins: ['*'],
+    allowHeaders: ['*'],
+    exposeHeaders: ['*'],
+});
+
 api.use(restify.plugins.bodyParser({ mapParams: true }));
 api.use(restify.plugins.queryParser());
+api.pre(cors.preflight);
+api.use(cors.actual);
 
 const pid = npid.create('server.pid', true);
 
 api.log.debug({ API_UID: process.env.API_UID, API_SECRET: process.env.API_SECRET }, `Launching ${api.name}`);
 
-const db = require('./modules/db')(api.log);
+const db = require('./modules/db')(api.log, pid);
 
 // ///////////////////////////////////////////////
 const Sessions = require('./classes/Sessions');
 const Access = require('./classes/Access');
+const RequestValidator = require('./classes/RequestValidator');
 const sender = require('./modules/sender');
 
 const sessions = new Sessions(api.log);
 const access = new Access(sessions);
+const validator = new RequestValidator(api.log);
 
-require('./routes/index')(api, access, sender, sessions);
-
-const killApp = () => {
-    db.close(() => {
-        pid.remove();
-        process.exit(0);
-    });
+const killApp = (status) => {
+    if (db) {
+        db.close(() => {
+            pid.remove();
+            process.exit(status);
+        });
+    }
 };
 
 const launchApi = async () => {
+    await validator.init();
+    require('./routes/index')(api, access, sender, sessions, validator);
     api.log.info('Connection to database established');
     try {
         await sessions.init();
@@ -47,7 +66,7 @@ const launchApi = async () => {
         });
     } catch (err) {
         api.log.error(err);
-        killApp();
+        killApp(1);
     }
 };
 
@@ -55,4 +74,4 @@ db.once('open', () => {
     launchApi();
 });
 
-process.on('SIGINT', killApp).on('SIGTERM', killApp).on('SIGUSR2', killApp);
+process.on('SIGINT', () => killApp(0)).on('SIGTERM', () => killApp(0));

@@ -12,14 +12,21 @@ module.exports = sessions => ({
                 token = await utilities.get42UserToken(req.query.code);
                 userSession = await sessions.registerSession(token);
             } catch (err) {
-                return (next(helpers.handleErrors(req, err)));
+                return (next(helpers.handleErrors(req.log, err)));
             }
             res.toSend = {
                 ...res.toSend,
                 session: userSession,
             };
-            return (next());
+            return next();
         }
         return (next(new errors.BadRequestError('Missing parameter')));
+    },
+    async delete(req, res, next) {
+        sessions.deleteSession(req.session.token.access_token);
+        res.toSend = {
+            message: 'Session succesfully deleted',
+        };
+        return next();
     },
 });

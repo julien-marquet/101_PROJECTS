@@ -1,21 +1,27 @@
 const { api42Endpoint, redirectUri } = require('../configs/global.config');
 const rp = require('request-promise');
-const User = require('../classes/User');
+const utilities = require('../utilities/user');
+const RequestError = require('../classes/RequestError');
 
 module.exports = {
     async get42UserToken(code) {
-        const res = await rp({
-            method: 'POST',
-            uri: `${api42Endpoint}oauth/token`,
-            form: {
-                client_id: process.env.API_UID,
-                client_secret: process.env.API_SECRET,
-                code,
-                redirect_uri: redirectUri,
-                grant_type: 'authorization_code',
-            },
-            json: true,
-        });
+        let res;
+        try {
+            res = await rp({
+                method: 'POST',
+                uri: `${api42Endpoint}oauth/token`,
+                form: {
+                    client_id: process.env.API_UID,
+                    client_secret: process.env.API_SECRET,
+                    code,
+                    redirect_uri: redirectUri,
+                    grant_type: 'authorization_code',
+                },
+                json: true,
+            });
+        } catch (err) {
+            throw new RequestError('GetUserToken', `${err.name} : ${err.error.error}`, err.statusCode);
+        }
         return ({
             ...res,
             expires_at: Math.floor(Date.now() / 1000) + res.expires_in,
@@ -36,7 +42,7 @@ module.exports = {
                 json: true,
             });
         } catch (err) {
-            throw (err);
+            throw new RequestError('RefreshToken', `${err.name} : ${err.error.error}`, err.statusCode);
         }
         return ({
             token: {
@@ -47,38 +53,29 @@ module.exports = {
         });
     },
     async createSession(token) {
-        let userExist;
-        const tokenInfo = await rp({
-            method: 'GET',
-            uri: `${api42Endpoint}oauth/token/info`,
-            headers: {
-                Authorization: `Bearer ${token.access_token}`,
-            },
-            json: true,
-        });
-        const user = new User();
+        let tokenInfo;
         try {
-            userExist = await user.init(tokenInfo.resource_owner_id);
-        } catch (userErr) {
-            throw userErr;
-        }
-        if (userExist) {
-            return ({
-                user: {
-                    ...user.infos,
+            tokenInfo = await rp({
+                method: 'GET',
+                uri: `${api42Endpoint}oauth/token/info`,
+                headers: {
+                    Authorization: `Bearer ${token.access_token}`,
                 },
+                json: true,
+            });
+        } catch (err) {
+            throw new RequestError('GetUserToken', `${err.name} : ${err.error.error}`, err.statusCode);
+        }
+        let user = await utilities.getUser(tokenInfo.resource_owner_id);
+        if (user != null) {
+            return ({
+                user,
                 token,
             });
         }
-        try {
-            await user.create(token.access_token);
-        } catch (userErr) {
-            throw userErr;
-        }
+        user = await utilities.createUser(token.access_token);
         return ({
-            user: {
-                ...user.infos,
-            },
+            user,
             token,
         });
     },

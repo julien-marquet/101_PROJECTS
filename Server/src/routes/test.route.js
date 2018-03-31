@@ -20,4 +20,11 @@ module.exports = (api, controller, access, sender) => {
         };
         next();
     }, sender);
+    api.get('test/all', (req, res, next) => {
+        res.toSend = {
+            ...res.toSend,
+            message: 'access all',
+        };
+        next();
+    }, sender);
 };
