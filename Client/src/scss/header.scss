@@ -1,3 +1,14 @@
-.headerWrapper {
+.maxHeight {
     height: 100%;
+}
+
+.circleWrapper {
+    height: 4rem;
+    width: 4rem;
+    border-radius: 100%;
+    overflow: hidden;
+}
+
+.userImg {
+    margin-left: -0.8rem;
 }

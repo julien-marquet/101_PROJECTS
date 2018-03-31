@@ -16,7 +16,7 @@ module.exports = sessions => ({
             }
             res.toSend = {
                 ...res.toSend,
-                session: userSession,
+                ...userSession,
             };
             return (next());
         }

@@ -2,7 +2,7 @@ import {Component} from "inferno";
 
 import "../../css/general.css";
 import Projects from "../containers/projects/projects";
-import Header from "./Header";
+import Header from "../containers/header";
 import Footer from "./Footer";
 
 class App extends Component {
