@@ -1,6 +1,8 @@
 require('dotenv').config();
 const restify = require('restify');
 const npid = require('npid');
+const corsMiddleware = require('restify-cors-middleware');
+
 const {
     name,
     version,
@@ -15,8 +17,17 @@ const api = restify.createServer({
     version,
     url: baseUrl,
 });
+const cors = corsMiddleware({
+    preflightMaxAge: 5,
+    origins: ['*'],
+    allowHeaders: ['*'],
+    exposeHeaders: ['*'],
+});
+
 api.use(restify.plugins.bodyParser({ mapParams: true }));
 api.use(restify.plugins.queryParser());
+api.pre(cors.preflight);
+api.use(cors.actual);
 
 const pid = npid.create('server.pid', true);
 
@@ -63,4 +74,4 @@ db.once('open', () => {
     launchApi();
 });
 
-process.on('SIGINT', () => killApp(0)).on('SIGTERM', () => killApp(0)).on('SIGUSR2', () => killApp(0));
+process.on('SIGINT', () => killApp(0)).on('SIGTERM', () => killApp(0));
