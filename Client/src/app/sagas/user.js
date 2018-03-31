@@ -8,13 +8,13 @@ function* checkUser() {
     if (localStorage.getItem("user") === null) {
         const code = new URL(window.location.href).searchParams.get("code");
         if (code !== null) {
-            const {error, user, token} = yield call(connectUserAPI, code);
-            infos.firstname = user.firstName;
-            infos.lastname = user.lastName;
-            infos.login = user.login;
-            infos.rank = user.rank;
-            infos.token = token.access_token;
-            if (error === undefined) {
+            const {user, token} = yield call(connectUserAPI, code);
+            if (user !== undefined) {
+                infos.firstname = user.firstName;
+                infos.lastname = user.lastName;
+                infos.login = user.login;
+                infos.rank = user.rank;
+                infos.token = token.access_token;
                 localStorage.setItem("user", JSON.stringify(infos));
             }
         }
@@ -22,7 +22,9 @@ function* checkUser() {
     else {
         infos = JSON.parse(localStorage.getItem("user"));
     }
-    yield put({type: USER_CONNECT_SUCCESS, payload: infos});
+    if (Object.keys(infos).length > 0) {
+        yield put({type: USER_CONNECT_SUCCESS, payload: infos});
+    }
 }
 
 function* flow() {
