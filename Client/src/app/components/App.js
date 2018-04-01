@@ -54,7 +54,7 @@ class App extends Component {
                             transform: `translateY(${y}rem)`
                         }}
                     >
-                        <Projects />
+                        {this.isActive("newProject") && <Projects />}
                     </div>
                 }
             </Motion>,
@@ -73,7 +73,7 @@ class App extends Component {
                             opacity: `${opacity}`
                         }}
                     >
-                        <Projects />
+                        {this.isActive("projects") && <Projects />}
                     </div>
                 }
             </Motion>
