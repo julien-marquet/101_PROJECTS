@@ -29,7 +29,7 @@ class Header extends Component {
                     className={"btn btn-dark w-50"}
                     onClick={this.login}
                 >
-                    Login
+                    {"Login"}
                 </button>
             );
         }
@@ -58,13 +58,43 @@ class Header extends Component {
         );
     }
 
+    renderMyProjects() {
+        if (this.props.user.login !== undefined) {
+            return (
+                <button
+                    type={"button"}
+                    className={"btn btn-dark headerFullButton"}
+                >
+                    {"My projects"}
+                </button>
+            );
+        }
+    }
+
+    renderNewProject() {
+        if (this.props.user.login !== undefined) {
+            return (
+                <button
+                    type={"button"}
+                    className={"btn btn-dark headerFullButton"}
+                >
+                    {"New project"}
+                </button>
+            );
+        }
+    }
+
     render() {
         return (
             <div className={"container-fluid header"}>
                 <div className={"row maxHeight align-items-center"}>
                     <div className={"col-4 maxHeight"}></div>
-                    <div className={"col-2 maxHeight"}></div>
-                    <div className={"col-2 maxHeight"}></div>
+                    <div className={"col-2 maxHeight"}>
+                        {this.renderMyProjects()}
+                    </div>
+                    <div className={"col-2 maxHeight"}>
+                        {this.renderNewProject()}
+                    </div>
                     <div className={"col-2 maxHeight"}></div>
                     <div className={"col-2 maxHeight"}>
                         {this.renderInfos()}
