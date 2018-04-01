@@ -3,14 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "bootstrap": "^4.0.0",
     "inferno": "^5.0.1",
     "inferno-redux": "^5.0.1",
     "inferno-scripts": "6.3.0",
-    "jquery": "^1.9.1",
+    "jquery": "^1.12.4",
     "node-sass-chokidar": "^1.2.2",
     "npm-run-all": "^4.1.2",
+    "popper.js": "^1.14.1",
     "redux": "^3.7.2",
-    "redux-saga": "^0.16.0"
+    "redux-saga": "^0.16.0",
+    "webpack": "^3.11.0"
   },
   "scripts": {
     "build-css": "node-sass-chokidar src/scss -o src/css",
