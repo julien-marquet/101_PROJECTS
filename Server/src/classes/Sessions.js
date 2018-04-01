@@ -1,7 +1,6 @@
 const utilities = require('../utilities/session');
+const modelUtilities = require('../utilities/modelUtilities');
 const AdminModel = require('mongoose').model('Admin');
-const errors = require('restify-errors');
-const helpers = require('../utilities/helpers');
 
 class Sessions {
     constructor(log) {
@@ -10,23 +9,12 @@ class Sessions {
         this.admins = [];
     }
     async init() {
-        let obj;
-        try {
-            obj = await AdminModel.find().lean().exec();
-        } catch (err) {
-            throw (new errors.InternalError(err));
-        }
-        this.admins = helpers.cleanLeanedResult(obj);
-        return (true);
+        this.admins = await AdminModel.find().lean();
+        this.admins = this.admins.map(o => modelUtilities.admin.toJSON(o));
     }
     async refreshSession(token) {
-        let refreshed;
         const oldSession = this.sessions[token];
-        try {
-            refreshed = await utilities.refreshToken(oldSession.token.refresh_token);
-        } catch (err) {
-            throw (err);
-        }
+        const refreshed = await utilities.refreshToken(oldSession.token.refresh_token);
         this.sessions[refreshed.token.access_token] = {
             ...oldSession,
             token: {
@@ -40,11 +28,7 @@ class Sessions {
         const existingSession = this.sessions[token.access_token];
         let userSession;
         if (!existingSession) {
-            try {
-                userSession = await utilities.createSession(token);
-            } catch (err) {
-                throw (err);
-            }
+            userSession = await utilities.createSession(token);
             userSession.user.rank = this.assignRank(userSession.user.id);
             this.sessions[token.access_token] = userSession;
             this.log.info(`Session created for user ${userSession.user.login}`);
@@ -62,6 +46,11 @@ class Sessions {
     }
     getSession(token) {
         return (this.sessions[token] || null);
+    }
+    deleteSession(token) {
+        if (this.sessions[token]) {
+            delete this.sessions[token];
+        }
     }
     getSessionStatus(token) {
         const session = this.sessions[token];

@@ -19,7 +19,7 @@ module.exports = () => {
         name: globalConfig.name,
         streams,
         serializers: {
-            err: errors.bunyanSerializer,
+            error: errors.bunyanSerializer,
             req: Logger.stdSerializers.req,
             res: Logger.stdSerializers.res,
         },

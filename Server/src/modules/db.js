@@ -2,7 +2,7 @@ const databaseConfig = require('../configs/database.config');
 const mongoose = require('mongoose');
 require('../models/index')();
 
-module.exports = (log) => {
+module.exports = (log, pid) => {
     const db = mongoose.connection;
 
     log.info(`Trying to connect to DB ${databaseConfig.db}`);
@@ -15,6 +15,8 @@ module.exports = (log) => {
         }),
     ).catch(() => {
         log.error('api initialization failed');
+        pid.remove();
+        process.exit(1);
     });
     return db;
 };

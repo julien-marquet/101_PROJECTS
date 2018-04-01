@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const routeLoader = (api, access, sender, sessions) => {
+const routeLoader = (api, access, sender, sessions, validator) => {
     (function readRoute(dirR = __dirname) {
         fs.readdirSync(dirR).forEach((route) => {
             if (fs.lstatSync(`${dirR}/${route}`).isDirectory()) {
@@ -14,7 +14,7 @@ const routeLoader = (api, access, sender, sessions) => {
                         if (fs.lstatSync(`${dirC}/${controller}`).isDirectory()) {
                             readController(`${dirC}/${controller}`);
                         } else if (controller.includes(`${name}.controller.js`)) {
-                            res = require(path.join(dirC, controller))(sessions);
+                            res = require(path.join(dirC, controller))(sessions, validator);
                             return (true);
                         }
                         return (false);
