@@ -77,6 +77,7 @@ class Header extends Component {
                 <button
                     type={"button"}
                     className={"btn btn-dark headerFullButton"}
+                    onClick={() => this.props.changePage({mainPage: "newProject"})}
                 >
                     {"New project"}
                 </button>

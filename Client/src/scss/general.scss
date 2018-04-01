@@ -52,8 +52,9 @@ html, body {
 
 .wrapper {
     width: 100%;
-    min-height: 50%;
+    height: 100rem;
     background-color: $backgroundColor;
+    z-index: -1;
 }
 
 .header, .footer {
