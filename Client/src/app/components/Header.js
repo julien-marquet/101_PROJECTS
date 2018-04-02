@@ -98,6 +98,7 @@ class Header extends Component {
                             <div className={"col-2 maxHeight"} >
                                 <img
                                     src={logo}
+                                    alt={"101's logo"}
                                     className={"maxHeight"}
                                 />
                             </div>

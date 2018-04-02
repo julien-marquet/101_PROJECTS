@@ -16,16 +16,12 @@ class App extends Component {
     }
 
     componentWillMount() {
-        this.pages.map((page, index) => {
-            this.active[page] = index === 0;
-        });
+        this.pages.map((page, index) => this.active[page] = index === 0);
     }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.mainPage !== this.props.mainPage) {
-            this.pages.map(page => {
-                this.active[page] = nextProps.mainPage === page;
-            });
+            this.pages.map(page => this.active[page] = nextProps.mainPage === page);
         }
     }
 
