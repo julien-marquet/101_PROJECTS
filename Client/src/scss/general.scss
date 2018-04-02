@@ -53,8 +53,14 @@ html, body {
 .wrapper {
     width: 100%;
     height: 100rem;
+    position: relative;
     background-color: $backgroundColor;
-    z-index: -1;
+}
+
+.subWrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .header, .footer {

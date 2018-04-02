@@ -3,6 +3,7 @@ import {Motion, spring} from "inferno-motion";
 
 import "../../css/general.css";
 import Projects from "../containers/projects/projects";
+import NewProject from "../components/projects/NewProject";
 import Header from "../containers/header";
 import Footer from "./Footer";
 
@@ -10,74 +11,55 @@ class App extends Component {
     constructor(props) {
         super(props);
 
+        this.active =  {};
         this.pages = ["projects", "newProject"];
-        this.state = {
-            wrapperY: -((this.pages.length - 1) * 100)
-        };
+    }
+
+    componentWillMount() {
+        this.pages.map((page, index) => {
+            this.active[page] = index === 0;
+        });
     }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.mainPage !== this.props.mainPage) {
-            this.pages.forEach(page => {
-                if (page === this.props.mainPage) {
-                    this.setState({
-                        wrapperY: this.state.wrapperY - 100
-                    });
-                    return ;
-                }
-                else if (page === nextProps.mainPage) {
-                    this.setState({
-                        wrapperY: this.state.wrapperY + 100
-                    });
-                    return ;
-                }
+            this.pages.map(page => {
+                this.active[page] = nextProps.mainPage === page;
             });
         }
     }
 
-    isActive(page) {
-        return (this.state.wrapperY === -((this.pages.length - 1 - this.pages.findIndex(el => el === page)) * 100));
-    }
-
-    renderWrapper() {
-        return [
+    renderPage(isActive, Child) {
+        return (
             <Motion
-                defaultStyle={{y: this.state.wrapperY}}
+                defaultStyle={{y: isActive ? 0 : -100, opacity: isActive ? 1: 0}}
                 style={{
-                    y: spring(this.state.wrapperY, {stiffness: 80, damping: 12})
-                }}
-            >
-                {({y}) => 
-                    <div
-                        className="container wrapper"
-                        style={{
-                            transform: `translateY(${y}rem)`
-                        }}
-                    >
-                        <Projects />
-                    </div>
-                }
-            </Motion>,
-            <Motion
-                defaultStyle={{y: this.state.wrapperY, opacity: 1}}
-                style={{
-                    y: spring(this.state.wrapperY, {stiffness: 50}),
-                    opacity: this.isActive("projects") ? 1 : spring(0, {stiffness: 130})
+                    y: spring(isActive ? 0 : -100, {stiffness: 80, damping: 12}),
+                    opacity: isActive ? 1 : spring(0, {stiffness: 130})
                 }}
             >
                 {({y, opacity}) => 
                     <div
-                        className="container wrapper"
+                        className={"subWrapper"}
                         style={{
-                            transform: `translateY(${y}rem)`,
-                            opacity: `${opacity}`
+                            opacity,
+                            transform: `translateY(${y}rem)`
                         }}
                     >
-                        <Projects />
+                        <Child />
                     </div>
                 }
             </Motion>
-        ];
+        );
+    }
+
+    renderWrapper() {
+        return (
+            <div className="container wrapper">
+                {this.renderPage(this.active.newProject, Projects)}
+                {this.renderPage(this.active.projects, Projects)}
+            </div>
+        );
     }
 
     render() {
