@@ -36,7 +36,7 @@ class App extends Component {
             >
                 {({y, opacity}) => 
                     <div
-                        className={"subWrapper"}
+                        className={"container-fluid subWrapper maxHeight"}
                         style={{
                             opacity,
                             transform: `translateY(${y}rem)`
@@ -52,7 +52,7 @@ class App extends Component {
     renderWrapper() {
         return (
             <div className="container wrapper">
-                {this.renderPage(this.active.newProject, Projects)}
+                {this.renderPage(this.active.newProject, NewProject)}
                 {this.renderPage(this.active.projects, Projects)}
             </div>
         );
