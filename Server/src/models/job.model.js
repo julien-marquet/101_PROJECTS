@@ -2,28 +2,32 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
-const ApplicationSchema = new Schema({
+const JobSchema = new Schema({
     projectId: {
         type: Schema.Types.ObjectId,
         required: true,
     },
-    userId: {
+    places: {
         type: Number,
-        required: true,
+        default: 1,
+        requred: true,
     },
-    jobId: {
-        type: Schema.Types.ObjectId,
-    },
-    type: {
+    label: {
         type: String,
-        enum: ['user', 'project'],
         required: true,
     },
-    initiator: {
-        type: Number,
+    skills: {
+        type: [String],
+    },
+    description: {
+        type: String,
+    },
+    applicant: {
+        type: [Number],
     },
 }, {
     timestamps: true,
 });
 
-module.exports = mongoose.model('Application', ApplicationSchema);
+module.exports = mongoose.model('Job', JobSchema);
+

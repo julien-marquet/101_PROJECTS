@@ -3,5 +3,5 @@ module.exports = (api, controller, access, sender) => {
     api.post('application/accept/:applicationId', access.check(['Student', 'Admin']), controller.accept.post, sender);
     api.post('application/cancel/:applicationId', access.check(['Student', 'Admin']), controller.cancel.post, sender);
     api.get('application/me', access.check(['Student', 'Admin']), controller.me.get, sender);
-    api.get('application/:applicationId', access.check(['Student', 'Admin']), controller.get, sender);    
+    api.get('application/:applicationId', access.check(['Student', 'Admin']), controller.get, sender);
 };

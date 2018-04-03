@@ -4,6 +4,9 @@ module.exports = {
         'userId',
     ],
     properties: {
+        jobId: {
+            type: 'string',
+        },
         userId: {
             type: 'number',
         },
