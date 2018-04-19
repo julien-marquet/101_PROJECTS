@@ -1,6 +1,7 @@
 import {connect} from "inferno-redux";
 
 import Header from "../components/Header";
+import {APP_PAGE_CHANGE} from "../actions/app";
 
 const mapStateToProps = ({user}) => {
     return {
@@ -8,4 +9,10 @@ const mapStateToProps = ({user}) => {
     };
 };
 
-export default connect(mapStateToProps)(Header);
+const mapDispatchToProps = dispatch => {
+    return {
+        changePage: payload => dispatch({type: APP_PAGE_CHANGE, payload})
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header);

@@ -52,11 +52,24 @@ html, body {
 
 .wrapper {
     width: 100%;
-    min-height: 50%;
+    height: 100rem;
+    position: relative;
     background-color: $backgroundColor;
+    z-index: -1;
+}
+
+.subWrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .header, .footer {
     background-color: purple;
     height: 7%;
+    z-index: 1;
+}
+
+.textarea {
+    resize: none;
 }

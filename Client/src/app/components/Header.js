@@ -3,6 +3,7 @@ import {Component} from "inferno";
 import "../../css/general.css";
 import "../../css/header.css";
 import config from "../../config/config";
+import logo from "../../img/101_logo_light.svg";
 
 class Header extends Component {
     constructor(props) {
@@ -77,6 +78,7 @@ class Header extends Component {
                 <button
                     type={"button"}
                     className={"btn btn-dark headerFullButton"}
+                    onClick={() => this.props.changePage({mainPage: "newProject"})}
                 >
                     {"New project"}
                 </button>
@@ -88,7 +90,23 @@ class Header extends Component {
         return (
             <div className={"container-fluid header"}>
                 <div className={"row maxHeight align-items-center"}>
-                    <div className={"col-4 maxHeight"}></div>
+                    <div className={"col-4 maxHeight"}>
+                        <div
+                            className={"row logo bg-light maxHeight"}
+                            onClick={() => this.props.changePage({mainPage: "projects"})}
+                        >
+                            <div className={"col-2 maxHeight"} >
+                                <img
+                                    src={logo}
+                                    alt={"101's logo"}
+                                    className={"maxHeight"}
+                                />
+                            </div>
+                            <div className={"col maxHeight"}>
+                                <h1>{"projects"}</h1>
+                            </div>
+                        </div>
+                    </div>
                     <div className={"col-2 maxHeight"}>
                         {this.renderMyProjects()}
                     </div>
@@ -96,7 +114,7 @@ class Header extends Component {
                         {this.renderNewProject()}
                     </div>
                     <div className={"col-2 maxHeight"}></div>
-                    <div className={"col-2 maxHeight"}>
+                    <div className={"col-2 maxHeight bg-dark"}>
                         {this.renderInfos()}
                     </div>
                 </div>

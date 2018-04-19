@@ -3,7 +3,6 @@ body {
 }
 
 .allProjects {
-    background-color: orange;
     height: 100%;
     padding: 2rem;
 }
@@ -29,4 +28,23 @@ body {
 .headerFullButton {
     width: 100%;
     height: 100%;
+}
+
+.coverImg {
+    height: 100%;
+    width: 100%;
+}
+
+.newProjectTitle {
+    height: 3rem;
+    margin-top: -1.5rem;
+    margin-left: 1.5rem;
+}
+
+.newProjectCover {
+    width: 100%;
+}
+
+.edition {
+    width: 100%;
 }

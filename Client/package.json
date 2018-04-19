@@ -5,6 +5,7 @@
   "dependencies": {
     "bootstrap": "^4.0.0",
     "inferno": "^5.0.1",
+    "inferno-motion": "^3.0.0",
     "inferno-redux": "^5.0.1",
     "inferno-scripts": "6.3.0",
     "jquery": "^1.12.4",

@@ -7,15 +7,8 @@ const UserSchema = new Schema({
     login: String,
     firstName: String,
     lastName: String,
+}, {
+    timestamps: true,
 });
-UserSchema.options.toJSON = {
-    transform(doc, ret) {
-        const res = ret;
-        res.id = ret._id;
-        delete res._id;
-        delete res.__v;
-        return res;
-    },
-};
 
 module.exports = mongoose.model('User', UserSchema);

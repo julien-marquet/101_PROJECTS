@@ -4,6 +4,6 @@ module.exports = {
     name: '101_PROJECTS',
     env: process.env.NODE_ENV || 'development',
     port: process.env.PORT || 8080,
-    base_url: process.env.BASE_URL || 'http://localhost:8080',
+    baseUrl: process.env.BASE_URL || 'http://localhost:8080',
     debug: true,
 };

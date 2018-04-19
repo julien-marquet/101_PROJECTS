@@ -1,0 +1,22 @@
+{
+    "type": "object",
+    "required": [
+        "linkProjectVersion"
+    ],
+    "properties": {
+        "status": {
+            "type": "string",
+            "enum": ["Alpha", "Beta", "Final Version"]
+        },
+        "version": {
+            "type": "string"
+        },
+        "linkProjectVersion": {
+            "type": "string"
+        },
+        "linkTestVersion": {
+            "type": "string"
+        }
+    },
+    "additionalProperties": false
+}

@@ -10,7 +10,7 @@ import {
 } from "redux";
 import reducers from "./app/reducers/index";
 import sagas from "./app/sagas/index";
-import App from "./app/components/App";
+import App from "./app/containers/app";
 import "./index.css";
 
 const sagaMiddleware = createSagaMiddleware();
